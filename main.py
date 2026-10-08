@@ -57,6 +57,14 @@ def main():
     )
     
     parser.add_argument(
+        '--chunk-size',
+        type=int,
+        default=pdf2md.DEFAULT_CHUNK_SIZE,
+        help='Pages converted per batch to limit memory use; lower it if the '
+             'process runs out of memory, 0 converts all pages at once '
+             f'(default: {pdf2md.DEFAULT_CHUNK_SIZE})'
+    )
+    parser.add_argument(
         '-y', '--yes',
         action='store_true',
         help='Non-interactive: accept default EPUB metadata and skip markdown review'
@@ -115,6 +123,7 @@ def main():
                     markdown_dir,
                     args.max_pages,
                     args.start_page,
+                    args.chunk_size,
                 )
             
             # Convert Markdown to EPUB unless skipped

@@ -148,10 +148,16 @@ Options:
   --start-page INT         Page number to start from
   --skip-epub              Skip EPUB generation, only create markdown
   --skip-md                Skip markdown generation, use existing markdown files
+  --chunk-size INT         Pages converted per batch (default 10, 0 = all at once)
   -y, --yes                Non-interactive: accept default metadata, skip review
 ```
 
 If `input_path` is omitted, all PDFs in `./input/` are processed.
+
+PDFs are converted in batches of `--chunk-size` pages with the models loaded
+once, so memory use stays flat regardless of document length. If the process
+is still killed for running out of memory (exit code 137), lower it, e.g.
+`--chunk-size 4`.
 
 ### Examples
 
