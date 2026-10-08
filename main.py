@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 import modules.pdf2md as pdf2md
 import modules.mark2epub as mark2epub
+import modules.archive_org as archive_org
 import torch
                 
 
@@ -23,7 +24,8 @@ def main():
         'input_path',
         nargs='?',
         type=str,
-        help='Path to input PDF file or directory (default: ./input/*.pdf)'
+        help='Path to input PDF file or directory, or an archive.org item URL '
+             '(default: ./input/*.pdf)'
     )
     parser.add_argument(
         'output_path',
@@ -54,11 +56,31 @@ def main():
         help='Skip markdown generation, use existing markdown files'
     )
     
+    parser.add_argument(
+        '-y', '--yes',
+        action='store_true',
+        help='Non-interactive: accept default EPUB metadata and skip markdown review'
+    )
+
     args = parser.parse_args()
-    
-    # Get input path
-    input_path = Path(args.input_path) if args.input_path else pdf2md.get_default_input_dir()
-    
+
+    # Metadata to prefill per PDF (e.g. from archive.org)
+    known_metadata = {}
+
+    # Download from archive.org if a URL was given
+    if args.input_path and archive_org.is_archive_url(args.input_path):
+        try:
+            pdf_file, metadata = archive_org.download(
+                args.input_path, pdf2md.get_default_input_dir()
+            )
+        except Exception as e:
+            print(f"Error downloading from archive.org: {e}", file=sys.stderr)
+            sys.exit(1)
+        known_metadata[pdf_file] = metadata
+        input_path = pdf_file
+    else:
+        input_path = Path(args.input_path) if args.input_path else pdf2md.get_default_input_dir()
+
     # Get queue of PDFs to process
     queue = pdf2md.add_pdfs_to_queue(input_path)
     print(f"Found {len(queue)} PDF files to process")
@@ -98,7 +120,12 @@ def main():
             # Convert Markdown to EPUB unless skipped
             if not args.skip_epub:
                 print("Converting Markdown to EPUB...")
-                mark2epub.convert_to_epub(markdown_dir, output_path)
+                mark2epub.convert_to_epub(
+                    markdown_dir,
+                    output_path,
+                    metadata=known_metadata.get(pdf_path),
+                    interactive=not args.yes,
+                )
                 
         except Exception as e:
             print(f"Error processing {pdf_path.name}: {str(e)}", file=sys.stderr)

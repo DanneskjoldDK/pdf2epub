@@ -125,6 +125,19 @@ and so on; press Enter to accept each default). It therefore needs a terminal â€
 run it non-interactively and it will fail with `EOFError`. Use `--skip-epub` to
 produce only markdown without any prompts.
 
+### From archive.org
+
+Pass an archive.org item URL instead of a file. The PDF is downloaded to
+`./input/` and the item's title, author, language, publisher and date are used
+as the EPUB metadata:
+
+```bash
+python main.py https://archive.org/details/alicesadventur00carr --yes
+```
+
+Only freely downloadable items (public domain / openly licensed) are
+supported. Lending-library ("Borrow") items are refused.
+
 ### Advanced Options
 
 ```bash
@@ -135,6 +148,7 @@ Options:
   --start-page INT         Page number to start from
   --skip-epub              Skip EPUB generation, only create markdown
   --skip-md                Skip markdown generation, use existing markdown files
+  -y, --yes                Non-interactive: accept default metadata, skip review
 ```
 
 If `input_path` is omitted, all PDFs in `./input/` are processed.
