@@ -174,7 +174,8 @@ def get_all_filenames(the_dir, extensions=[]):
     all_files = [x for x in all_files if x.split(".")[-1] in extensions]
     return all_files
 
-def get_packageOPF_XML(md_filenames=[], image_filenames=[], css_filenames=[], description_data=None, lang="en"):
+def get_packageOPF_XML(md_filenames=[], image_filenames=[], css_filenames=[], description_data=None, lang="en",
+                       mathml_filenames=()):
     doc = minidom.Document()
 
     package = doc.createElement('package')
@@ -232,6 +233,8 @@ def get_packageOPF_XML(md_filenames=[], image_filenames=[], css_filenames=[], de
     for i,md_filename in enumerate(md_filenames):
         x = doc.createElement('item')
         x.setAttribute('id',"s{:05d}".format(i))
+        if md_filename in mathml_filenames:
+            x.setAttribute('properties', "mathml")
         x.setAttribute('href', quote("s{:05d}-{}.xhtml".format(i, md_filename.split(".")[0])))
         x.setAttribute('media-type',"application/xhtml+xml")
         manifest.appendChild(x)
@@ -440,14 +443,16 @@ def convert_math_to_mathml(html_text: str) -> str:
         mathml = try_convert(m.group(1))
         return f'<span class="math-display">{mathml}</span>' if mathml else m.group(0)
 
-    # Inline $...$
+    # Inline $...$, using pandoc's rule so currency is left alone: the opening $
+    # must be followed by a non-space, the closing $ preceded by a non-space
+    # and not followed by a digit ("$10 and $20" is not math)
     def replace_inline(m):
         mathml = try_convert(m.group(1))
         return f'<span class="math-inline">{mathml}</span>' if mathml else m.group(0)
 
     masked = re.sub(r'<p>\s*\$\$(.*?)\$\$\s*</p>', replace_display_paragraph, masked, flags=re.DOTALL)
     masked = re.sub(r'\$\$(.*?)\$\$', replace_display_inline, masked, flags=re.DOTALL)
-    masked = re.sub(r'(?<!\$)\$(?!\$)(.*?)(?<!\$)\$(?!\$)', replace_inline, masked, flags=re.DOTALL)
+    masked = re.sub(r'(?<![\$\\])\$(?![\s$])([^$]+?)(?<![\s\\])\$(?![\d$])', replace_inline, masked)
 
     for key, original in placeholders.items():
         masked = masked.replace(key, original)
@@ -655,6 +660,7 @@ def main(args, metadata: Optional[Dict] = None, interactive: bool = True):
             epub.writestr("OPS/package.opf", 
                 get_packageOPF_XML(
                     md_filenames=all_md_filenames,
+                    mathml_filenames={md for md, xhtml in chapter_data.items() if "<math" in xhtml},
                     image_filenames=all_image_filenames,
                     css_filenames=all_css_filenames,
                     description_data=json_data,
