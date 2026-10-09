@@ -15,6 +15,7 @@ PALETTES = {
     # background, text, accent (rules and frame)
     "letters": ((14, 17, 24), (214, 178, 94), (178, 145, 70)),
     "book": ((244, 239, 228), (28, 28, 30), (139, 43, 34)),
+    "novel": ((23, 48, 40), (236, 226, 200), (196, 164, 98)),
 }
 
 BOLD_SERIF = ["georgiab.ttf", "Georgia Bold.ttf", "Caladea-Bold.ttf", "LiberationSerif-Bold.ttf",

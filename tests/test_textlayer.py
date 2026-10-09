@@ -167,3 +167,45 @@ def test_book_image_and_caption(book):
 ])
 def test_tidy(raw, expected):
     assert textlayer._tidy(raw) == expected
+
+
+# --------------------------------------------------------------------- novel
+@pytest.fixture(scope="module")
+def novel(tmp_path_factory):
+    out = tmp_path_factory.mktemp("novel")
+    textlayer.convert_pdf(str(FIXTURES / "novel.pdf"), out)
+    return out
+
+
+def test_novel_chapters_and_title_page(novel):
+    desc = json.loads(chapter(novel, "description.json"))
+    assert desc["layout"] == "novel" and desc["theme"] == "novel"
+    # the title page wins over junk PDF metadata ("Microsoft Word - ...", "Compaq_Owner")
+    assert desc["metadata"]["dc:title"] == "The Keeper of Gull Point"
+    assert desc["metadata"]["dc:creator"] == "Margaret Ellis"
+    assert [c["title"] for c in desc["chapters"]] == [
+        "I. In Which the Lighthouse Keeper Receives a Letter",
+        "II. Which Concerns Oranges, and a Visitor",
+        "III. In Which the Letter Is Opened at Last",
+    ]
+
+
+def test_novel_chapter_opening(novel):
+    text = chapter(novel, "001.md")
+    assert '<p class="chapter-number">Chapter I</p>' in text
+    assert '<h1 class="chapter-title">In Which the Lighthouse Keeper Receives a Letter</h1>' in text
+    assert '<p class="first">Mr. Tobias Wren had kept the light' in text
+    assert "THE KEEPER OF GULL POINT" not in text
+
+
+def test_novel_hand_wrapped_paragraphs(novel):
+    text = chapter(novel, "001.md")
+    # sentences ending at a line end inside a paragraph do not split it
+    assert text.count("<p>") + text.count('<p class="first">') == 4
+    assert "He made tea. He did not open it.</p>" in text
+    assert "<p>“It has,” said Tobias.</p>" in chapter(novel, "002.md")
+
+
+def test_titlecase_keeps_roman_numerals():
+    assert textlayer._titlecase("THE REIGN OF CHARLES II") == "The Reign of Charles II"
+    assert textlayer._titlecase("A TALE OF TWO CITIES") == "A Tale of Two Cities"

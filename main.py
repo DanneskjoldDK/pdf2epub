@@ -96,9 +96,9 @@ def main():
     )
     parser.add_argument(
         '--layout',
-        choices=['auto', 'book', 'letters'],
+        choices=['auto', 'book', 'letters', 'novel'],
         default='auto',
-        help="Text-layer engine only: 'letters' makes one chapter per dated letter, "
+        help="Text-layer engine only: 'novel' makes one chapter per 'Chapter N' heading; 'letters' makes one chapter per dated letter, "
              "grouped by year; 'book' splits at the top-level headings "
              "(default: detect)"
     )

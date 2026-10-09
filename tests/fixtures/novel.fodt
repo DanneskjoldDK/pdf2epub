@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Test fixture: a short original story (no rights restrictions) set the way
+  Project Gutenberg texts often arrive in PDF form: a title page, chapter
+  numbers with all-capital titles, and hand-wrapped lines with blank lines
+  between paragraphs. Regenerate novel.pdf as described in README.md.
+-->
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+  xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
+ <office:meta><dc:title>Microsoft Word - keeper.doc</dc:title><meta:initial-creator>Compaq_Owner</meta:initial-creator></office:meta>
+ <office:font-face-decls>
+  <style:font-face style:name="Liberation Serif" svg:font-family="'Liberation Serif'" style:font-family-generic="roman"/>
+ </office:font-face-decls>
+ <office:styles>
+  <style:default-style style:family="paragraph">
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0.17in"/>
+   <style:text-properties style:font-name="Liberation Serif" fo:font-size="10pt" fo:language="en" fo:country="US"/>
+  </style:default-style>
+  <style:style style:name="Standard" style:family="paragraph" style:class="text"/>
+  <style:style style:name="Body" style:family="paragraph" style:parent-style-name="Standard"/>
+  <style:style style:name="TitleBig" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-align="center" fo:margin-top="1.5in" fo:margin-bottom="0.25in"/>
+   <style:text-properties fo:font-size="18pt" fo:font-weight="bold"/>
+  </style:style>
+  <style:style style:name="AuthorName" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-align="center"/>
+   <style:text-properties fo:font-size="14pt" fo:font-weight="bold"/>
+  </style:style>
+  <style:style style:name="ChapterNum" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-align="center" fo:break-before="page" fo:margin-bottom="0.15in"/>
+   <style:text-properties fo:font-size="14pt"/>
+  </style:style>
+  <style:style style:name="ChapterTitle" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-bottom="0.3in"/>
+   <style:text-properties fo:font-weight="bold"/>
+  </style:style>
+ </office:styles>
+ <office:automatic-styles>
+  <style:page-layout style:name="pm1">
+   <style:page-layout-properties fo:page-width="8.27in" fo:page-height="11.69in" fo:margin-top="1in" fo:margin-bottom="0.8in" fo:margin-left="1.4in" fo:margin-right="1.4in"/>
+   <style:footer-style><style:header-footer-properties fo:min-height="0.3in"/></style:footer-style>
+  </style:page-layout>
+ </office:automatic-styles>
+ <office:master-styles>
+  <style:master-page style:name="Standard" style:page-layout-name="pm1">
+   <style:footer><text:p text:style-name="AuthorName"><text:page-number text:select-page="current">1</text:page-number></text:p></style:footer>
+  </style:master-page>
+ </office:master-styles>
+ <office:body><office:text>
+<text:p text:style-name="TitleBig">THE KEEPER OF GULL POINT</text:p>
+<text:p text:style-name="AuthorName">MARGARET ELLIS</text:p>
+<text:p text:style-name="ChapterNum">Chapter I</text:p>
+<text:p text:style-name="ChapterTitle">IN WHICH THE LIGHTHOUSE KEEPER RECEIVES A LETTER</text:p>
+<text:p text:style-name="Body">Mr. Tobias Wren had kept the light on Gull Point for nineteen<text:line-break/>years, and in all that time he had received exactly four<text:line-break/>letters. He said "exactly" whenever he told the story, as<text:line-break/>though the number were a matter of pride.</text:p>
+<text:p text:style-name="Body">The fifth arrived on a Tuesday. It was addressed in a hand he<text:line-break/>did not know, sealed with green wax, and it smelled faintly of<text:line-break/>oranges. Tobias turned it over twice. He set it on the table.<text:line-break/>He made tea. He did not open it.</text:p>
+<text:p text:style-name="Body">It's not that he was afraid of letters. He simply believed<text:line-break/>that a thing worth reading was worth waiting for, and that<text:line-break/>waiting improved most things -- tea, bread, and news among<text:line-break/>them.</text:p>
+<text:p text:style-name="Body">By evening the wind had risen and the lamp needed tending. The<text:line-break/>letter stayed where it was, propped against the sugar tin,<text:line-break/>while the beam swung out over the water and back again,<text:line-break/>patient as a clock. Somewhere beyond the reef a ship was<text:line-break/>working north against the weather, and Tobias watched her<text:line-break/>lights until they slipped below the edge of the sea.</text:p>
+<text:p text:style-name="ChapterNum">Chapter II</text:p>
+<text:p text:style-name="ChapterTitle">WHICH CONCERNS ORANGES, AND A VISITOR</text:p>
+<text:p text:style-name="Body">The visitor came on Thursday, rowing a small grey boat with<text:line-break/>more determination than skill. She introduced herself as Miss<text:line-break/>Adeline Perch, and she wanted to know whether her letter had<text:line-break/>arrived.</text:p>
+<text:p text:style-name="Body">"It has," said Tobias.</text:p>
+<text:p text:style-name="Body">"And you have read it?"</text:p>
+<text:p text:style-name="Body">"Not yet." He considered. "Waiting improves most things."</text:p>
+<text:p text:style-name="Body">Miss Perch looked at him for a long moment, and then, to his<text:line-break/>surprise, she laughed.</text:p>
+<text:p text:style-name="ChapterNum">Chapter III</text:p>
+<text:p text:style-name="ChapterTitle">IN WHICH THE LETTER IS OPENED AT LAST</text:p>
+<text:p text:style-name="Body">They opened it together, at the table, with the sugar tin<text:line-break/>moved politely aside. Inside was a single sheet and a pressed<text:line-break/>orange blossom, and the sheet said only that the light on Gull<text:line-break/>Point had once guided a ship home, and that someone aboard had<text:line-break/>never forgotten it.</text:p>
+<text:p text:style-name="Body">Tobias read it twice. Then he put the kettle on, because some<text:line-break/>news is best taken with tea.</text:p>
+ </office:text></office:body>
+</office:document>

@@ -194,8 +194,8 @@ Options:
   --skip-md                Skip markdown generation, use existing markdown files
   --chunk-size INT         Pages converted per batch (default 10, 0 = all at once)
   --engine ENGINE          auto (default), textlayer or marker; see below
-  --layout LAYOUT          Text-layer engine: auto (default), book or letters
-  --theme THEME            EPUB styling: default, book or letters
+  --layout LAYOUT          Text-layer engine: auto (default), book, novel or letters
+  --theme THEME            EPUB styling: default, book, novel or letters
   -y, --yes                Non-interactive: accept default metadata, skip review
 ```
 
@@ -229,6 +229,12 @@ otherwise. The choice is printed for every file.
 The text-layer engine recognises two layouts (`--layout`, detected by default):
 
 - **book**: one chapter per top-level heading.
+- **novel**: fiction and other books divided into "Chapter I", "CHAPTER 12."
+  and the like. Each chapter keeps its number and title (all-capital titles
+  are set in title case), the book title and author come from the title page,
+  and text wrapped by hand at a fixed width (as in Project Gutenberg texts)
+  is rejoined into paragraphs. Detected automatically when the PDF has at
+  least three chapter headings.
 - **letters**: a collection of dated letters, such as shareholder letters. Each
   letter becomes a chapter titled by its date, and the contents group the
   letters by year (an annual letter written in January or February is filed
@@ -239,11 +245,14 @@ Themes (`--theme`) control the look of the EPUB:
 
 - **default**: the plain style, as before.
 - **book**: indented paragraphs, generated cover, title page and contents.
+- **novel**: classic fiction typography: chapters open on a new page with the
+  number in spaced small capitals, the title in italics and a large initial;
+  indented paragraphs; a dark green and cream cover.
 - **letters**: letters open under their year, financial tables are set with
   rules above and below and right-aligned figures, and a black-and-gold cover,
   a title page and a year-by-year contents page are generated.
 
-Text-layer output uses the letters or book theme automatically; marker output
+Text-layer output uses the matching novel, letters or book theme automatically; marker output
 keeps the default theme unless you pass `--theme`. The theme is remembered in
 `description.json`, so `--skip-md` runs reuse it. The generated cover is
 redrawn on every run; to use your own, put the image in `images/` and set
@@ -251,6 +260,11 @@ redrawn on every run; to use your own, put the image in `images/` and set
 `description.json`.
 
 ### Examples
+
+Convert a novel from archive.org (public domain) in one go:
+```bash
+python main.py https://archive.org/details/AroundTheWorldInEightyDays-JulesVerne --layout novel --yes
+```
 
 Convert a collection of letters, without prompts:
 ```bash

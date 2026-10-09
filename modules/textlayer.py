@@ -39,7 +39,7 @@ PAGE_NUMBER_RE = re.compile(r"^(page\s+)?[-–—]?\s*([0-9]+|[ivxlc]+)\s*[-–�
 CLOSING_RE = re.compile(r"^(Cordially|Sincerely|Very truly yours|Yours (truly|sincerely)|"
                         r"Respectfully|Best regards|Kind regards|Regards)\b.*,?$", re.I)
 SALUTATION_RE = re.compile(r"^(To (My|the|All|Our) [A-Z]?[\w ]{0,40}:|Dear [\w .,'-]{1,60}[,:])$")
-ELISIONS = ("em", "til", "tis", "twas", "n")
+ELISIONS = ("em", "til", "tis", "twas", "n", "change", "cello", "phone", "bus", "round", "neath", "prentice")
 NOTE_MARKER_RE = re.compile(r"^(\d{1,3})[.)]?$|^[*†‡§]+$")
 
 
@@ -58,6 +58,8 @@ class Char:
     italic: bool
     ul: bool = False
     sup: bool = False
+    weight: float = 400.0
+    named_bold: bool = False      # the font name says Bold/Black/Heavy
 
 
 @dataclass(slots=True)
@@ -86,6 +88,7 @@ class Metrics:
     page_width: float
     page_height: float
     justified: bool
+    hardwrap: bool = False      # lines broken by hand (e.g. Project Gutenberg text)
     words: set = field(default_factory=set)
     hyphenated: set = field(default_factory=set)
 
@@ -219,10 +222,12 @@ def _page_lines(page_dict, page_no: int, rules) -> list[Line]:
                     cfont = ch.get("font") or font
                     cname = cfont.get("name") or name
                     cweight = cfont.get("weight") or weight
+                    named = "Bold" in cname or "Black" in cname or "Heavy" in cname
                     chars.append(Char(
                         ch["char"], x0, y0, x1, y1, float(cfont.get("size") or 0),
-                        "Bold" in cname or "Black" in cname or "Heavy" in cname or cweight >= 600,
-                        "Italic" in cname or "Oblique" in cname))
+                        named or cweight >= 600,
+                        "Italic" in cname or "Oblique" in cname,
+                        weight=float(cweight), named_bold=named))
             if chars and "".join(c.c for c in chars).strip():
                 raw.append(chars)
 
@@ -465,6 +470,25 @@ class NoteLinker:
         return [n for n in self.notes if not n.nid]
 
 
+def normalize_weights(pages: list[list[Line]]) -> None:
+    """Judge bold against the document's own body weight.
+
+    Some PDFs report every glyph of an embedded font as heavy (body text at
+    700, bold at 732); a fixed threshold would then make all text bold.
+    """
+    weights = Counter(round(c.weight) for lines in pages for ln in lines for c in ln.chars
+                      if c.c.strip() and c.weight > 0)
+    if not weights:
+        return
+    body = weights.most_common(1)[0][0]
+    if body < 600:
+        return
+    for lines in pages:
+        for ln in lines:
+            for c in ln.chars:
+                c.bold = c.named_bold or c.weight >= body + 25
+
+
 def measure(pages: list[list[Line]], page_width: float, page_height: float) -> Metrics:
     sizes = Counter()
     for lines in pages:
@@ -492,6 +516,11 @@ def measure(pages: list[list[Line]], page_width: float, page_height: float) -> M
     full = [ln for ln in body_lines if abs(ln.x0 - left) < 2 and len(ln.text) > 30]
     justified = bool(full) and sum(ln.x1 > right - 1.5 for ln in full) > 0.6 * len(full)
     m = Metrics(body, left, right, pitch, page_width, page_height, justified)
+    # text wrapped at a fixed character count leaves most lines well short of
+    # the margin, so a short line says nothing about where a paragraph ends
+    widths = sorted(ln.x1 - ln.x0 for ln in body_lines if abs(ln.x0 - left) < 2 and len(ln.text) > 20)
+    if widths and not justified:
+        m.hardwrap = widths[len(widths) // 2] < 0.85 * (right - left)
     for lines in pages:
         for ln in lines:
             if ln.figure:
@@ -633,7 +662,8 @@ def group_blocks(lines: list[Line], m: Metrics) -> list[list[Line]]:
             tab, ptab = is_tabular(ln, m), is_tabular(prev, m)
             new = False
             if ln.page != prev.page:
-                cont = (not tab and not ptab and _is_full(prev, m)
+                full = (not _ends_sentence(prev.text)) if m.hardwrap else _is_full(prev, m)
+                cont = (not tab and not ptab and full
                         and abs(ln.x0 - min(x.x0 for x in cur[-2:])) < 3
                         and not _is_heading_line(ln, m))
                 cont = cont or (not tab and not ptab and ln.text[:1].islower())
@@ -651,7 +681,7 @@ def group_blocks(lines: list[Line], m: Metrics) -> list[list[Line]]:
                     pass                                     # list item continuation
                 elif same_left and 0.8 * m.body_size < indent < 5 * m.body_size:
                     new = True                               # first-line indent
-                elif (prev.x1 < m.right - max(4 * m.body_size, 0.15 * m.width)
+                elif (not m.hardwrap and prev.x1 < m.right - max(4 * m.body_size, 0.15 * m.width)
                       and abs(ln.x0 - prev.x0) < 2 and _ends_sentence(prev.text)
                       and (ln.text[:1].isupper() or ln.text[:1] in "\"“‘'(0123456789")
                       and not is_centered(prev, m)):
@@ -807,6 +837,13 @@ def inline_html(chars: list[Char], *, strip_ul=False, strip_bold=False, typograp
     out = re.sub(r"</em>(\s*)<em>", r"\1", out)
     out = re.sub(r"</strong>(\s*)<strong>", r"\1", out)
     return _tidy(out) if typography else re.sub(r"\s+", " ", out).strip()
+
+
+def inline_html_text(text: str, typography=True) -> str:
+    """Plain text -> escaped XHTML with the same typographic clean-up."""
+    if typography:
+        return html.escape(_tidy(_smart_quotes(text)), quote=False)
+    return html.escape(text, quote=False)
 
 
 def _join_lines(lines: list[Line], m: Metrics) -> list[Char]:
@@ -1076,9 +1113,90 @@ def _review_year(d: date, text: str) -> int:
 
 
 def _titlecase(s: str) -> str:
-    small = {"a", "an", "and", "of", "the", "to", "in", "on", "for", "at", "by"}
-    words = s.lower().split()
-    return " ".join(w if (k and w in small) else w[:1].upper() + w[1:] for k, w in enumerate(words))
+    small = {"a", "an", "and", "of", "the", "to", "in", "on", "for", "at", "by", "or", "as", "but", "with"}
+    out = []
+    for k, w in enumerate(s.lower().split()):
+        core = w.strip(".,;:!?()\"'")
+        if re.fullmatch(r"[ivxlc]{2,}", core) and core not in ("ill", "civil", "liv"):
+            out.append(w.upper())                  # Roman numerals: "CHARLES II"
+        elif k and core in small and not out[-1].endswith((":", ".", "—")):
+            out.append(w)
+        else:
+            i = next((j for j, ch in enumerate(w) if ch.isalpha()), 0)
+            out.append(w[:i] + w[i:i + 1].upper() + w[i + 1:])
+    return " ".join(out)
+
+
+CHAPTER_RE = re.compile(
+    r"^(chapter|chapitre|kapitel|kapitel|book|part)\s+([ivxlcdm]+|\d+|[a-z]+(?:-[a-z]+)?)\.?$", re.I)
+_NUMBER_WORDS = ("one two three four five six seven eight nine ten eleven twelve thirteen fourteen "
+                 "fifteen sixteen seventeen eighteen nineteen twenty").split()
+
+
+def _is_chapter_line(ln: Line, m: Metrics) -> bool:
+    t = ln.text.strip()
+    mt = CHAPTER_RE.match(t)
+    if not mt or ln.figure:
+        return False
+    num = mt.group(2).lower()
+    if not (re.fullmatch(r"[ivxlcdm]+|\d+", num) or num.split("-")[0] in _NUMBER_WORDS):
+        return False
+    return is_centered(ln, m) or ln.size >= 1.1 * m.body_size or _ratio(ln, "bold") > 0.9 or t.isupper()
+
+
+def split_chapters(lines: list[Line], m: Metrics) -> tuple[list[Line], list[dict]]:
+    """Front matter and chapters ({label, title, lines}) of a novel-like text."""
+    starts = [i for i, ln in enumerate(lines) if _is_chapter_line(ln, m)]
+    front = lines[:starts[0]] if starts else lines
+    chapters = []
+    for k, s in enumerate(starts):
+        e = starts[k + 1] if k + 1 < len(starts) else len(lines)
+        label = re.sub(r"\s+", " ", lines[s].text).rstrip(".")
+        j = s + 1
+        title_lines = []
+        # the chapter title: heading-like lines right after the number
+        while j < e and not lines[j].figure and len(title_lines) < 4:
+            ln = lines[j]
+            heading_like = (_ratio(ln, "bold") > 0.9 or ln.text.isupper() or ln.size >= 1.1 * m.body_size
+                            or (is_centered(ln, m) and ln.text[:1].isupper()))
+            if not heading_like or len(ln.text) > 120:
+                break
+            title_lines.append(ln)
+            j += 1
+        title = " ".join(ln.text for ln in title_lines)
+        if title.isupper():
+            title = _titlecase(title)
+        chapters.append({"label": label[:1].upper() + label[1:].lower() if label.isupper() else label,
+                         "number": label.split()[-1], "title": title, "lines": lines[j:e]})
+    return front, chapters
+
+
+def _title_from_front(front: list[Line], m: Metrics) -> tuple[str | None, str | None]:
+    """Book title (largest lines) and author (next line) from a title page."""
+    text_lines = [ln for ln in front if not ln.figure and ln.text]
+    if not text_lines:
+        return None, None
+    top = max(ln.size for ln in text_lines)
+    title_lines = [ln for ln in text_lines if abs(ln.size - top) < 0.6]
+    first = text_lines.index(title_lines[0])
+    title_block = []
+    for ln in text_lines[first:]:
+        if abs(ln.size - top) < 0.6 and (not title_block or ln.y0 - title_block[-1].y1 < 0.8 * top):
+            title_block.append(ln)
+        else:
+            break
+    title = " ".join(ln.text for ln in title_block)
+    rest = [ln for ln in text_lines[first + len(title_block):] if len(ln.text.split()) <= 6]
+    author = re.sub(r"^by\s+", "", rest[0].text, flags=re.I) if rest else None
+    fix = (lambda t: _titlecase(t) if t and t.isupper() else t)
+    return fix(title), fix(author)
+
+
+def _junk_meta(value: str) -> bool:
+    """PDF metadata left by the authoring tool rather than describing the book."""
+    v = value.strip().lower()
+    return (not v or v.startswith(("microsoft word", "untitled")) or v.endswith((".doc", ".docx", ".pdf"))
+            or "_" in v or v in ("owner", "user", "admin", "administrator") or v.endswith("owner"))
 
 
 def split_letters(pages: list[list[Line]], m: Metrics) -> list[dict]:
@@ -1169,6 +1287,12 @@ def _signature(letters_html: list[str]) -> str | None:
 
 
 def detect_layout(pages: list[list[Line]], m: Metrics) -> str:
+    if sum(1 for p in pages for ln in p if _is_chapter_line(ln, m)) >= 3:
+        return "novel"
+    return _detect_letters_or_book(pages, m)
+
+
+def _detect_letters_or_book(pages: list[list[Line]], m: Metrics) -> str:
     starts = find_letter_starts(pages, m)
     dated = sum(1 for s in starts if any(DATE_RE.match(ln.text.strip()) for ln in _head(pages[s], m)))
     return "letters" if len(starts) >= 3 and dated >= 2 else "book"
@@ -1201,6 +1325,7 @@ def convert_pdf(input_path: str, output_dir: Path, max_pages: int = None, start_
 
     pages = read_pdf(input_path, page_ids, image_dir=output_dir / "images")
     pages = strip_furniture(pages, height)
+    normalize_weights(pages)
     m = measure(pages, width, height)
     notes = extract_footnotes(pages, m)
     linker = NoteLinker(notes, m, typography)
@@ -1212,12 +1337,40 @@ def convert_pdf(input_path: str, output_dir: Path, max_pages: int = None, start_
         old.unlink()
     chapters = []
     metadata = {}
-    if meta.get("Title"):
+    if meta.get("Title") and not _junk_meta(meta["Title"]):
         metadata["dc:title"] = meta["Title"].strip()
-    if meta.get("Author"):
+    if meta.get("Author") and not _junk_meta(meta["Author"]):
         metadata["dc:creator"] = meta["Author"].strip()
 
-    if layout == "letters":
+    if layout == "novel":
+        lines = [ln for p in pages for ln in p]
+        front, parts = split_chapters(lines, m)
+        title, author = _title_from_front(front, m)
+        if title:
+            metadata["dc:title"] = title
+        if author:
+            metadata["dc:creator"] = author
+        sizes = [s for s in _heading_sizes(lines, m)]
+        for n, part in enumerate(parts, 1):
+            blocks = render(part["lines"], m, sizes, base_level=2, typography=typography)
+            body_html, used = linker.link("\n\n".join(h for _, h in blocks))
+            if n == len(parts):
+                used += linker.leftovers()
+            if used:
+                body_html += "\n\n" + linker.section(used)
+            body_html = body_html.replace("<p>", '<p class="first">', 1)
+            head = ['<header class="chapter-head">',
+                    f'<p class="chapter-number">{html.escape(part["label"])}</p>']
+            if part["title"]:
+                head.append(f'<h1 class="chapter-title">{inline_html_text(part["title"], typography)}</h1>')
+            else:
+                head[1] = f'<h1 class="chapter-number">{html.escape(part["label"])}</h1>'
+            head.append("</header>")
+            name = f"{n:03d}.md"
+            (output_dir / name).write_text("\n".join(head) + "\n\n" + body_html + "\n", encoding="utf-8")
+            toc = f'{part["number"]}. {part["title"]}' if part["title"] else part["label"]
+            chapters.append({"markdown": name, "css": "", "title": html.unescape(inline_html_text(toc, typography))})
+    elif layout == "letters":
         letters = split_letters(pages, m)
         sizes = _heading_sizes([ln for p in pages for ln in p], m)
         rendered = []
@@ -1294,7 +1447,7 @@ def convert_pdf(input_path: str, output_dir: Path, max_pages: int = None, start_
     existing["chapters"] = chapters
     existing["layout"] = layout
     existing["engine"] = "textlayer"
-    existing.setdefault("theme", "letters" if layout == "letters" else "book")
+    existing.setdefault("theme", layout if layout in ("letters", "novel") else "book")
     existing.setdefault("default_css", ["style.css"])
     existing.setdefault("cover_image", None)
     description_path.write_text(json.dumps(existing, indent=2, ensure_ascii=False), encoding="utf-8")
