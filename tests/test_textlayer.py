@@ -1,5 +1,6 @@
 """Tests for the text-layer engine on the fixtures in tests/fixtures."""
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -94,8 +95,9 @@ def test_list_items_keep_their_labels(letters):
 def test_tables(letters):
     text = chapter(letters, "001.md")
     assert '<th class="num">Partnerships Operating<br/>Entire Year</th>' in text
-    assert '<tr class="sub gap"><th colspan="3">COMPOUNDED</th></tr>' in text
-    assert '<td>1968–69</td><td class="num">20.6%</td><td class="num">−2.8%</td>' in text
+    # shading restarts after the sub-heading: its first row is shaded again
+    assert '<tr class="sub gap"><th colspan="3">COMPOUNDED</th></tr><tr class="gap shade"><td>1968</td>' in text
+    assert '<tr><td>1968–69</td><td class="num">20.6%</td><td class="num">−2.8%</td>' in text
     assert '<p class="table-note">* Including dividends' in text
     # tab-aligned figures become a two-column table
     assert '<td>Harbor Lane Partners</td><td class="num">4.6%</td>' in chapter(letters, "002.md")
@@ -104,7 +106,7 @@ def test_tables(letters):
 def test_balance_sheet(letters):
     text = chapter(letters, "004.md")
     assert '<td>Marketable securities at market (which exceeds cost)</td>' in text
-    assert text.count('<tr class="total">') == 3
+    assert len(re.findall(r'<tr class="[^"]*\btotal\b', text)) == 3
     assert '<th class="num">11/30/72 (unaudited)</th>' in text
 
 

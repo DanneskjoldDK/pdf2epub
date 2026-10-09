@@ -95,7 +95,7 @@ table.data td {
   padding: 0.35em 0.6em;
   vertical-align: bottom;
 }
-table.data tbody tr:nth-child(odd) td { background-color: #e3e3e3; }
+table.data tr.shade td { background-color: #e3e3e3; }
 table.data thead th {
   font-weight: bold;
   text-align: center;

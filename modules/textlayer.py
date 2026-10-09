@@ -975,13 +975,18 @@ def render_table(region: list[Line], m: Metrics, typography=True) -> str:
                 head[k].append(cell_html([cs], strip_bold=True))
 
     trs = []
+    stripe = 0          # shading restarts after each sub-heading row
     for r in merged:
         ln = r["line"]
         cls = ["gap"] if r["gap"] else []
         if len(r["cells"]) == 1 and is_centered(ln, m):
             text = cell_html(r["cells"], strip_bold=True)
             trs.append(f'<tr class="{" ".join(["sub"] + cls)}"><th colspan="{ncol}">{text}</th></tr>')
+            stripe = 0
             continue
+        if stripe % 2 == 0:
+            cls.append("shade")
+        stripe += 1
         if r["bold"]:
             cls.append("total")
         tds = []
