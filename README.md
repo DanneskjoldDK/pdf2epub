@@ -85,6 +85,47 @@ print(torch.backends.mps.is_available())  # Should return True for Apple Silicon
 print(torch.version.hip)  # Should print ROCm version for AMD
 ```
 
+### 🪟 Windows quick start (Windows Terminal / PowerShell)
+
+1. Install Git and Python 3.13, then close and reopen the terminal so the new
+   commands are found:
+   ```powershell
+   winget install Git.Git
+   winget install Python.Python.3.13
+   ```
+
+2. Clone the repository:
+   ```powershell
+   cd $HOME\Documents
+   git clone https://github.com/DanneskjoldDK/pdf2epub.git
+   cd pdf2epub
+   ```
+
+3. Create a virtual environment and install the packages:
+   ```powershell
+   py -3.13 -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   pip install -r requirements.txt
+   ```
+   If PowerShell refuses to run `Activate.ps1`, run
+   `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once and try again.
+   The install is large (several GB, mostly PyTorch) and takes a while.
+
+4. Convert a PDF. In every new terminal, activate the environment first:
+   ```powershell
+   cd $HOME\Documents\pdf2epub
+   .\.venv\Scripts\Activate.ps1
+   python main.py "$HOME\Downloads\letters.pdf" --layout letters --yes
+   ```
+   The EPUB is written to a folder named after the PDF, next to the PDF. Leave
+   out `--yes` to be asked for the title, author and other metadata.
+
+To update later, run `git pull` and `pip install -r requirements.txt` in the
+activated environment.
+
+Born-digital PDFs use the text-layer engine and convert in seconds without a
+GPU. Scanned PDFs go to marker, which is slow on a CPU.
+
 ### 🐳 Docker
 
 A CPU-only image can be built from the included `Dockerfile`:
