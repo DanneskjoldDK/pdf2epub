@@ -1,0 +1,99 @@
+@charset "utf-8";
+/* Novel theme: classic fiction typography. Chapters open on a new page with
+   the chapter number in spaced small capitals, the title in italics and a
+   large initial; paragraphs are indented and set without spacing. */
+
+body {
+  font-family: Georgia, "Charis SIL", "Palatino Linotype", "Book Antiqua", "Times New Roman", serif;
+  line-height: 1.5;
+  margin: 0 5%;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  widows: 2;
+  orphans: 2;
+}
+
+p { margin: 0; text-indent: 1.4em; }
+p.first, h2 + p, h3 + p, blockquote + p, p.center + p, table + p { text-indent: 0; }
+
+/* ---- Chapter openings ---------------------------------------------------- */
+header.chapter-head {
+  page-break-before: always;
+  break-before: page;
+  text-align: center;
+  margin: 3em 0 2.4em 0;
+}
+p.chapter-number, h1.chapter-number {
+  font-size: 0.95em;
+  font-weight: normal;
+  font-variant: small-caps;
+  letter-spacing: 0.25em;
+  text-indent: 0;
+  text-align: center;
+  margin: 0 0 1em 0;
+}
+h1.chapter-title {
+  font-size: 1.25em;
+  font-weight: normal;
+  font-style: italic;
+  line-height: 1.4;
+  margin: 0 8%;
+}
+header.chapter-head::after {
+  content: "";
+  display: block;
+  width: 3em;
+  margin: 1.6em auto 0 auto;
+  border-top: 1px solid #8c7a55;
+}
+
+/* Large initial and small capitals at the start of each chapter */
+p.first::first-letter {
+  float: left;
+  font-size: 3.4em;
+  line-height: 0.85;
+  margin: 0.06em 0.08em 0 0;
+  color: #2f4a3f;
+}
+p.first::first-line {
+  font-variant: small-caps;
+  letter-spacing: 0.03em;
+}
+
+h2, h3, h4 { font-size: 1em; font-weight: bold; text-align: center; margin: 1.6em 0 0.8em 0; }
+.center { text-align: center; text-indent: 0; }
+blockquote { margin: 0.8em 2em; font-size: 0.95em; }
+blockquote p { text-indent: 0; }
+p.item { padding-left: 2em; text-indent: -2em; }
+p.item span.label { display: inline-block; width: 2em; text-indent: 0; }
+p.scene-break { text-indent: 0; text-align: center; margin: 1em 0; letter-spacing: 0.6em; }
+img { max-width: 100%; height: auto; }
+
+table.data { border-collapse: collapse; margin: 1em auto; font-size: 0.9em; }
+table.data th, table.data td { padding: 0.2em 0.6em; }
+table.data .num { text-align: right; }
+
+/* ---- Generated title and contents pages ----------------------------------- */
+section.titlepage { text-align: center; margin-top: 22%; }
+section.titlepage p { text-align: center; text-indent: 0; }
+h1.tp-title { font-size: 2.2em; font-weight: normal; line-height: 1.2; margin: 0 0 1.2em 0; }
+p.tp-author { font-variant: small-caps; letter-spacing: 0.15em; font-size: 1.15em; margin-bottom: 2em; }
+p.tp-subtitle { font-style: italic; margin-bottom: 3em; }
+p.tp-publisher { font-size: 0.9em; color: #444; }
+
+section.contents h1 {
+  font-size: 1em;
+  font-weight: normal;
+  font-variant: small-caps;
+  letter-spacing: 0.25em;
+  text-align: center;
+  margin: 2em 0 1.6em 0;
+}
+ol.contents-list { list-style: none; padding: 0; margin: 0 4%; }
+ol.contents-list li { margin: 0 0 0.7em 0; text-indent: -1.5em; padding-left: 1.5em; text-align: left; line-height: 1.35; }
+ol.contents-list a { text-decoration: none; color: inherit; }
+
+section.footnotes { margin-top: 2em; border-top: 0.5px solid #999; padding-top: 0.6em; font-size: 0.85em; }
+section.footnotes p { text-indent: 0; margin-bottom: 0.4em; text-align: left; }
+a.noteref { text-decoration: none; }
