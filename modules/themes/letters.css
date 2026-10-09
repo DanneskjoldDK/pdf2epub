@@ -1,0 +1,172 @@
+@charset "utf-8";
+/* Letters theme: collections of dated letters (shareholder letters and
+   similar). Each letter opens on a new page under its year; financial
+   tables are set with rules above and below, as in printed annual-letter
+   compilations. */
+
+body {
+  font-family: Georgia, "Charis SIL", "Times New Roman", serif;
+  line-height: 1.45;
+  margin: 0 5%;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  widows: 2;
+  orphans: 2;
+}
+
+p { margin: 0 0 0.75em 0; text-indent: 0; }
+em { font-style: italic; }
+
+/* ---- Letter openings ---------------------------------------------------- */
+header.letter-head {
+  page-break-before: always;
+  break-before: page;
+  text-align: center;
+  margin: 2.5em 0 2em 0;
+}
+p.letter-year {
+  font-size: 2.6em;
+  line-height: 1.1;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.25em 0;
+  text-align: center;
+}
+h1.letter-date {
+  font-size: 1em;
+  font-weight: normal;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  margin: 0;
+  padding-bottom: 0.9em;
+  border-bottom: 1px solid #777;
+}
+p.letter-subtitle {
+  font-variant: small-caps;
+  letter-spacing: 0.08em;
+  margin: 0.8em 0 0 0;
+  text-align: center;
+}
+
+/* ---- Section headings inside a letter ----------------------------------- */
+h2, h3, h4 {
+  font-size: 1em;
+  font-weight: bold;
+  text-align: left;
+  margin: 1.6em 0 0.6em 0;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+h2.center, h3.center, h4.center { text-align: center; letter-spacing: 0.05em; }
+
+/* ---- Letter furniture ---------------------------------------------------- */
+p.salutation { margin-bottom: 1em; }
+p.closing { margin-top: 1.6em; margin-bottom: 0.3em; }
+p.signature { font-variant: small-caps; letter-spacing: 0.04em; margin-top: 0; }
+.center { text-align: center; }
+
+blockquote {
+  margin: 0.4em 2em 0.9em 2em;
+  font-size: 0.95em;
+}
+blockquote p { margin-bottom: 0.4em; }
+
+p.item {
+  padding-left: 2.2em;
+  text-indent: -2.2em;
+  text-align: left;
+}
+p.item span.label {
+  display: inline-block;
+  width: 2.2em;
+  text-indent: 0;
+}
+
+/* ---- Tables -------------------------------------------------------------- */
+table.data {
+  border-collapse: collapse;
+  margin: 1.1em auto 1.3em auto;
+  font-size: 0.85em;
+  line-height: 1.3;
+  text-align: left;
+  border-top: 1.5px solid #000;
+  border-bottom: 1.5px solid #000;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+table.data th,
+table.data td {
+  padding: 0.22em 0.75em;
+  vertical-align: bottom;
+}
+table.data thead th {
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 0.75px solid #000;
+  padding-top: 0.45em;
+  padding-bottom: 0.35em;
+}
+table.data .num { text-align: right; }
+table.data thead th.num { text-align: right; }
+table.data tbody tr:first-child td { padding-top: 0.4em; }
+table.data tr.sub th {
+  text-align: center;
+  font-weight: normal;
+  font-variant: small-caps;
+  letter-spacing: 0.1em;
+  padding-top: 0.9em;
+  padding-bottom: 0.3em;
+}
+table.data tr.gap td { padding-top: 0.75em; }
+table.data tr.total td {
+  font-weight: bold;
+  border-top: 0.5px solid #555;
+}
+p.table-note {
+  font-size: 0.8em;
+  line-height: 1.35;
+  margin: -0.6em 1.5em 1.1em 1.5em;
+  text-align: left;
+}
+
+img { max-width: 100%; height: auto; }
+
+/* ---- Generated title and contents pages ----------------------------------- */
+section.titlepage { text-align: center; margin-top: 18%; }
+section.titlepage p { text-align: center; }
+p.tp-author { font-variant: small-caps; letter-spacing: 0.12em; font-size: 1.1em; margin-bottom: 2.5em; }
+h1.tp-title { font-size: 2.1em; line-height: 1.2; font-weight: normal; margin: 0 0 0.5em 0; }
+p.tp-subtitle { font-size: 1.2em; letter-spacing: 0.08em; margin-bottom: 3em; }
+p.tp-publisher { font-size: 0.9em; letter-spacing: 0.06em; color: #444; }
+
+section.contents h1 {
+  font-size: 1.4em;
+  font-weight: normal;
+  letter-spacing: 0.1em;
+  text-align: center;
+  margin: 1.5em 0 1.2em 0;
+}
+table.letter-index { border-collapse: collapse; margin: 0 auto; width: 100%; }
+table.letter-index th {
+  text-align: right;
+  vertical-align: top;
+  font-weight: bold;
+  padding: 0.35em 1.2em 0.35em 0;
+  width: 25%;
+  border-top: 0.5px solid #999;
+}
+table.letter-index td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.35em 0;
+  border-top: 0.5px solid #999;
+  line-height: 1.5;
+}
+table.letter-index a, ol.contents-list a { text-decoration: none; color: inherit; }
+ol.contents-list { list-style: none; padding: 0; margin: 0 auto; }
+ol.contents-list li { margin: 0.35em 0; }
+
+/* ---- Notes ---------------------------------------------------------------- */
+section.footnotes { margin-top: 2em; border-top: 0.5px solid #999; padding-top: 0.6em; font-size: 0.85em; }
+section.footnotes p { margin-bottom: 0.4em; text-align: left; }
+a.noteref { text-decoration: none; }
