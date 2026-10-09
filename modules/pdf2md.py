@@ -163,6 +163,18 @@ def convert_pdf(
         # All output will go to the output directory
         output_dir.mkdir(parents=True, exist_ok=True)
 
+        # A previous text-layer run in this directory listed its own chapter
+        # files in description.json; drop them so marker's output is used
+        description = output_dir / "description.json"
+        if description.exists():
+            data = json.loads(description.read_text(encoding="utf-8"))
+            if data.get("engine") == "textlayer":
+                for chapter in data.get("chapters", []):
+                    (output_dir / chapter["markdown"]).unlink(missing_ok=True)
+                for key in ("chapters", "layout", "engine", "theme"):
+                    data.pop(key, None)
+                description.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+
         # Save markdown content
         md_output = output_dir / f"{Path(input_path).stem}.md"
         md_output.write_text(full_text, encoding='utf-8')
