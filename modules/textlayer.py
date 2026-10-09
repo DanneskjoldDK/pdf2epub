@@ -1229,6 +1229,10 @@ def convert_pdf(input_path: str, output_dir: Path, max_pages: int = None, start_
                 chapters[-1]["group"] if chapters else "")
             title = letter["title"] or (letter["subtitle"] and _titlecase(letter["subtitle"])) or f"Letter {n}"
             head = ['<header class="letter-head">']
+            org = next((t for t in letter["letterhead"]
+                        if re.search(r"[A-Za-z]{3}", t) and not re.match(r"^\d{4}\b", t)), None)
+            if org:
+                head.append(f'<p class="letter-org">{html.escape(_titlecase(org) if org.isupper() else org)}</p>')
             if group:
                 head.append(f'<p class="letter-year">{html.escape(group)}</p>')
             head.append(f'<h1 class="letter-date">{html.escape(title)}</h1>')

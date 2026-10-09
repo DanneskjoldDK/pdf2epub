@@ -18,34 +18,30 @@ body {
 p { margin: 0 0 0.75em 0; text-indent: 0; }
 em { font-style: italic; }
 
-/* ---- Letter openings ---------------------------------------------------- */
+/* ---- Letter openings: organisation, dateline, bold salutation ---------- */
 header.letter-head {
   page-break-before: always;
   break-before: page;
-  text-align: center;
-  margin: 2.5em 0 2em 0;
+  margin: 1.5em 0 1.6em 0;
 }
-p.letter-year {
-  font-size: 2.6em;
-  line-height: 1.1;
-  letter-spacing: 0.06em;
-  margin: 0 0 0.25em 0;
+p.letter-org {
+  font-size: 1.6em;
+  font-weight: bold;
+  line-height: 1.2;
   text-align: center;
+  margin: 0 0 1.1em 0;
 }
+p.letter-year { display: none; }      /* the year is in the contents */
 h1.letter-date {
   font-size: 1em;
   font-weight: normal;
-  font-style: italic;
-  letter-spacing: 0.02em;
+  text-align: right;
   margin: 0;
-  padding-bottom: 0.9em;
-  border-bottom: 1px solid #777;
 }
 p.letter-subtitle {
-  font-variant: small-caps;
-  letter-spacing: 0.08em;
-  margin: 0.8em 0 0 0;
+  font-weight: bold;
   text-align: center;
+  margin: 1em 0 0 0;
 }
 
 /* ---- Section headings inside a letter ----------------------------------- */
@@ -60,7 +56,7 @@ h2, h3, h4 {
 h2.center, h3.center, h4.center { text-align: center; letter-spacing: 0.05em; }
 
 /* ---- Letter furniture ---------------------------------------------------- */
-p.salutation { margin-bottom: 1em; }
+p.salutation { font-weight: bold; text-align: left; margin-bottom: 1em; }
 p.closing { margin-top: 1.6em; margin-bottom: 0.3em; }
 p.signature { font-variant: small-caps; letter-spacing: 0.04em; margin-top: 0; }
 .center { text-align: center; }
@@ -72,6 +68,7 @@ blockquote {
 blockquote p { margin-bottom: 0.4em; }
 
 p.item {
+  margin-left: 1.5em;
   padding-left: 2.2em;
   text-indent: -2.2em;
   text-align: left;
@@ -82,50 +79,45 @@ p.item span.label {
   text-indent: 0;
 }
 
-/* ---- Tables -------------------------------------------------------------- */
+/* ---- Tables: shaded alternate rows, figures right-aligned, a rule above
+   subtotals and a double rule under the closing total ------------------- */
 table.data {
   border-collapse: collapse;
+  width: 94%;
   margin: 1.1em auto 1.3em auto;
-  font-size: 0.85em;
-  line-height: 1.3;
+  line-height: 1.35;
   text-align: left;
-  border-top: 1.5px solid #000;
-  border-bottom: 1.5px solid #000;
   page-break-inside: avoid;
   break-inside: avoid;
 }
 table.data th,
 table.data td {
-  padding: 0.22em 0.75em;
+  padding: 0.35em 0.6em;
   vertical-align: bottom;
 }
+table.data tbody tr:nth-child(odd) td { background-color: #e3e3e3; }
 table.data thead th {
   font-weight: bold;
   text-align: center;
-  border-bottom: 0.75px solid #000;
-  padding-top: 0.45em;
-  padding-bottom: 0.35em;
+  padding-bottom: 0.45em;
 }
-table.data .num { text-align: right; }
-table.data thead th.num { text-align: right; }
-table.data tbody tr:first-child td { padding-top: 0.4em; }
+table.data .num { text-align: right; white-space: nowrap; }
+table.data thead th.num { text-align: right; white-space: normal; }
 table.data tr.sub th {
-  text-align: center;
-  font-weight: normal;
-  font-variant: small-caps;
-  letter-spacing: 0.1em;
-  padding-top: 0.9em;
-  padding-bottom: 0.3em;
-}
-table.data tr.gap td { padding-top: 0.75em; }
-table.data tr.total td {
   font-weight: bold;
-  border-top: 0.5px solid #555;
+  text-align: center;
+  background-color: transparent;
+  padding-top: 1em;
+  padding-bottom: 0.45em;
 }
+table.data tr.gap td { padding-top: 0.6em; }
+table.data tr.total td { font-weight: normal; }
+table.data tr.total td.num { border-top: 1px solid #000; }
+table.data tr.total:last-child td.num { border-bottom: 3px double #000; }
 p.table-note {
-  font-size: 0.8em;
+  font-size: 0.85em;
   line-height: 1.35;
-  margin: -0.6em 1.5em 1.1em 1.5em;
+  margin: -0.6em 3% 1.1em 3%;
   text-align: left;
 }
 
