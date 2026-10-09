@@ -5,18 +5,39 @@ from pathlib import Path
 import modules.pdf2md as pdf2md
 import modules.mark2epub as mark2epub
 import modules.archive_org as archive_org
-import torch
-                
 
 
-def main():
+def report_device():
+    """Say which device marker's models will run on (imports torch lazily)."""
+    import torch
     if torch.cuda.is_available():
         print("CUDA is available. Using GPU for processing.")
     elif torch.backends.mps.is_available():
         print("MPS is available. Using Apple Silicon for processing.")
     else:
         print("CUDA is not available. Using CPU for processing.")
-        
+
+
+def choose_engine(pdf_path: Path, requested: str) -> str:
+    """Resolve --engine auto to 'textlayer' or 'marker' for one PDF."""
+    if requested != "auto":
+        return requested
+    try:
+        import modules.textlayer as textlayer
+        result = textlayer.assess(str(pdf_path))
+    except Exception as e:
+        print(f"Could not inspect the text layer ({e}); using marker.")
+        return "marker"
+    if result["suitable"]:
+        print("The PDF has its own text layer; using the fast text-layer engine.")
+        return "textlayer"
+    reason = ("its text is set in columns" if result["multicolumn"]
+              else "it has no usable text layer (scanned?)")
+    print(f"Using marker (OCR and layout models) because {reason}.")
+    return "marker"
+
+
+def main():
     parser = argparse.ArgumentParser(
         description='Convert PDF files to EPUB format via Markdown'
     )
@@ -57,6 +78,39 @@ def main():
     )
     
     parser.add_argument(
+        '--chunk-size',
+        type=int,
+        default=pdf2md.DEFAULT_CHUNK_SIZE,
+        help='Pages converted per batch to limit memory use; lower it if the '
+             'process runs out of memory, 0 converts all pages at once '
+             f'(default: {pdf2md.DEFAULT_CHUNK_SIZE})'
+    )
+    parser.add_argument(
+        '--engine',
+        choices=['auto', 'marker', 'textlayer'],
+        default='auto',
+        help="PDF to Markdown engine. 'textlayer' reads the text the PDF already "
+             "contains: much faster, keeps italics and underlining, but needs a "
+             "born-digital, single-column PDF. 'marker' runs OCR and layout models "
+             "and handles scans and multi-column pages. 'auto' (default) picks per PDF"
+    )
+    parser.add_argument(
+        '--layout',
+        choices=['auto', 'book', 'letters'],
+        default='auto',
+        help="Text-layer engine only: 'letters' makes one chapter per dated letter, "
+             "grouped by year; 'book' splits at the top-level headings "
+             "(default: detect)"
+    )
+    parser.add_argument(
+        '--theme',
+        choices=mark2epub.available_themes(),
+        default=None,
+        help="EPUB styling. 'letters' and 'book' add a generated cover, title page "
+             "and contents page (default: the theme stored for this book, else "
+             "letters/book for text-layer output and default for marker output)"
+    )
+    parser.add_argument(
         '-y', '--yes',
         action='store_true',
         help='Non-interactive: accept default EPUB metadata and skip markdown review'
@@ -87,6 +141,7 @@ def main():
     
     # Process each PDF
     failed = []
+    device_reported = False
     for pdf_path in queue:
         print(f"\nProcessing: {pdf_path.name}")
         
@@ -109,13 +164,28 @@ def main():
                 
             # Convert PDF to Markdown unless skipped
             if not args.skip_md:
+                engine = choose_engine(pdf_path, args.engine)
                 print("Converting PDF to Markdown...")
-                pdf2md.convert_pdf(
-                    str(pdf_path),
-                    markdown_dir,
-                    args.max_pages,
-                    args.start_page,
-                )
+                if engine == "textlayer":
+                    import modules.textlayer as textlayer
+                    textlayer.convert_pdf(
+                        str(pdf_path),
+                        markdown_dir,
+                        args.max_pages,
+                        args.start_page,
+                        layout=args.layout,
+                    )
+                else:
+                    if not device_reported:
+                        report_device()
+                        device_reported = True
+                    pdf2md.convert_pdf(
+                        str(pdf_path),
+                        markdown_dir,
+                        args.max_pages,
+                        args.start_page,
+                        args.chunk_size,
+                    )
             
             # Convert Markdown to EPUB unless skipped
             if not args.skip_epub:
@@ -125,6 +195,7 @@ def main():
                     output_path,
                     metadata=known_metadata.get(pdf_path),
                     interactive=not args.yes,
+                    theme=args.theme,
                 )
                 
         except Exception as e:

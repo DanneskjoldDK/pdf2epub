@@ -14,6 +14,26 @@ from urllib.parse import quote
 from xml.sax.saxutils import escape as xml_escape
 import latex2mathml.converter
 
+THEMES_DIR = Path(__file__).parent / "themes"
+
+
+def available_themes() -> list[str]:
+    return sorted(p.stem for p in THEMES_DIR.glob("*.css"))
+
+
+def theme_css(theme: str) -> bytes:
+    """CSS for a theme from modules/themes/<theme>.css."""
+    path = THEMES_DIR / f"{theme}.css"
+    if not path.exists():
+        raise ValueError(f"Unknown theme '{theme}'. Available: {', '.join(available_themes())}")
+    return path.read_bytes()
+
+
+def chapter_href(index: int, md_filename: str) -> str:
+    """File name of a chapter inside the EPUB."""
+    return quote("s{:05d}-{}.xhtml".format(index, md_filename.split(".")[0]))
+
+
 def get_user_input(prompt: str, default: str = "") -> str:
     """Get user input with a default value."""
     user_input = input(f"{prompt} [{default}]: ").strip()
@@ -47,12 +67,52 @@ def get_metadata_from_user(existing_metadata: Optional[Dict] = None, interactive
         value = get_user_input(prompt, default) if interactive else default
         updated_metadata[key] = value
         
-    return {
+    result = dict(existing_metadata)   # keep other settings (theme, layout, ...)
+    result.update({
         "metadata": updated_metadata,
         "default_css": existing_metadata.get("default_css", ["style.css"]),
         "chapters": existing_metadata.get("chapters", []),
         "cover_image": existing_metadata.get("cover_image", None)
-    }
+    })
+    return result
+
+def _open_path(path: Path) -> None:
+    """Open a file or folder in the desktop's default application."""
+    if sys.platform == 'darwin':
+        subprocess.run(['open', str(path)], check=True)
+    elif os.name == 'posix':
+        subprocess.run(['xdg-open', str(path)], check=True)
+    else:
+        os.startfile(str(path))
+
+
+def review_markdown_files(work_dir: Path, md_filenames: list[str]) -> tuple[bool, dict]:
+    """Offer one review of all chapter files; returns (continue, contents)."""
+    if len(md_filenames) == 1:
+        ok, content = review_markdown(work_dir / md_filenames[0])
+        return ok, {md_filenames[0]: content}
+    while True:
+        response = input(f"\nWould you like to review the {len(md_filenames)} markdown files "
+                         "before conversion? (y/n): ").lower()
+        if response in ['y', 'yes']:
+            try:
+                _open_path(work_dir)
+            except Exception as e:
+                print(f"\nError opening {work_dir}: {e}")
+                print("You can edit the files there yourself.")
+            while True:
+                proceed = input("\nPress Enter when you're done editing (or 'q' to abort): ").lower()
+                if proceed == 'q':
+                    return False, {}
+                if proceed == '':
+                    break
+            break
+        elif response in ['n', 'no']:
+            break
+        else:
+            print("Please enter 'y' or 'n'")
+    return True, {name: (work_dir / name).read_text(encoding='utf-8') for name in md_filenames}
+
 
 def review_markdown(markdown_path: Path) -> tuple[bool, str]:
     """Ask user if they want to review the markdown file."""
@@ -62,12 +122,7 @@ def review_markdown(markdown_path: Path) -> tuple[bool, str]:
         response = input("\nWould you like to review the markdown file before conversion? (y/n): ").lower()
         if response in ['y', 'yes']:
             try:
-                if sys.platform == 'darwin':
-                    subprocess.run(['open', str(markdown_path)], check=True)
-                elif os.name == 'posix':
-                    subprocess.run(['xdg-open', str(markdown_path)], check=True)
-                else:
-                    os.startfile(str(markdown_path))
+                _open_path(markdown_path)
                 
                 while True:
                     proceed = input("\nPress Enter when you're done editing (or 'q' to abort): ").lower()
@@ -174,7 +229,8 @@ def get_all_filenames(the_dir, extensions=[]):
     all_files = [x for x in all_files if x.split(".")[-1] in extensions]
     return all_files
 
-def get_packageOPF_XML(md_filenames=[], image_filenames=[], css_filenames=[], description_data=None, lang="en"):
+def get_packageOPF_XML(md_filenames=[], image_filenames=[], css_filenames=[], description_data=None, lang="en",
+                       mathml_filenames=()):
     doc = minidom.Document()
 
     package = doc.createElement('package')
@@ -232,7 +288,9 @@ def get_packageOPF_XML(md_filenames=[], image_filenames=[], css_filenames=[], de
     for i,md_filename in enumerate(md_filenames):
         x = doc.createElement('item')
         x.setAttribute('id',"s{:05d}".format(i))
-        x.setAttribute('href', quote("s{:05d}-{}.xhtml".format(i, md_filename.split(".")[0])))
+        if md_filename in mathml_filenames:
+            x.setAttribute('properties', "mathml")
+        x.setAttribute('href', chapter_href(i, md_filename))
         x.setAttribute('media-type',"application/xhtml+xml")
         manifest.appendChild(x)
 
@@ -304,8 +362,22 @@ def get_container_XML():
     container_data += """</rootfiles>\n</container>"""
     return container_data
 
-def get_coverpage_XML(title, authors, lang="en"):
-    """Generate a simple cover page with title and optional author input."""
+def get_coverpage_XML(title, authors, lang="en", cover_image=None):
+    """Generate the cover page: the cover image if given, else title and author."""
+    if cover_image:
+        return f"""<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="{xml_escape(lang)}" lang="{xml_escape(lang)}">
+<head>
+<title>{xml_escape(title)}</title>
+<style type="text/css">
+html, body {{ margin: 0; padding: 0; height: 100%; text-align: center; }}
+img {{ max-width: 100%; max-height: 100%; height: auto; }}
+</style>
+</head>
+<body epub:type="cover">
+<img src="images/{quote(cover_image)}" alt="{xml_escape(title)}"/>
+</body>
+</html>"""
     return f"""<?xml version="1.0" encoding="utf-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{xml_escape(lang)}" lang="{xml_escape(lang)}">
 <head>
@@ -348,7 +420,29 @@ p {{
 </body>
 </html>"""
 
-def get_TOC_XML(default_css_filenames, markdown_filenames, lang="en"):
+def _toc_entries(markdown_filenames, titles=None, groups=None, hidden=()):
+    """[(label, href, children)]; consecutive chapters sharing a group are nested."""
+    entries = []
+    last_group = None
+    for i, md_filename in enumerate(markdown_filenames):
+        if md_filename in hidden:
+            continue
+        label = (titles or {}).get(md_filename) or md_filename.split(".")[0]
+        href = chapter_href(i, md_filename)
+        group = (groups or {}).get(md_filename)
+        if group:
+            if entries and last_group == group:
+                entries[-1][2].append((label, href, []))
+            else:
+                entries.append((group, href, [(label, href, [])]))
+        else:
+            entries.append((label, href, []))
+        last_group = group
+    return entries
+
+
+def get_TOC_XML(default_css_filenames, markdown_filenames, lang="en", titles=None, groups=None,
+                hidden=(), landmarks=None):
     ## Returns the XML data for the TOC.xhtml file
 
     toc_xhtml = """<?xml version="1.0" encoding="UTF-8"?>\n"""
@@ -359,36 +453,62 @@ def get_TOC_XML(default_css_filenames, markdown_filenames, lang="en"):
     for css_filename in default_css_filenames:
         toc_xhtml += """<link rel="stylesheet" href="css/{}" type="text/css"/>\n""".format(css_filename)
 
+    def items(entries):
+        out = ""
+        for label, href, children in entries:
+            out += """<li><a href="{}">{}</a>""".format(href, xml_escape(label))
+            if children:
+                out += "<ol>" + items(children) + "</ol>"
+            out += "</li>"
+        return out
+
     toc_xhtml += """</head>\n<body>\n"""
     toc_xhtml += """<nav epub:type="toc" role="doc-toc" id="toc">\n<h2>Contents</h2>\n<ol epub:type="list">"""
-    for i,md_filename in enumerate(markdown_filenames):
-        stem = md_filename.split(".")[0]
-        href = quote("s{:05d}-{}.xhtml".format(i, stem))
-        toc_xhtml += """<li><a href="{}">{}</a></li>""".format(href, xml_escape(stem))
-    toc_xhtml += """</ol>\n</nav>\n</body>\n</html>"""
+    toc_xhtml += items(_toc_entries(markdown_filenames, titles, groups, hidden))
+    toc_xhtml += """</ol>\n</nav>\n"""
+    if landmarks:
+        toc_xhtml += """<nav epub:type="landmarks" hidden="hidden">\n<h2>Guide</h2>\n<ol>"""
+        for kind, href, label in landmarks:
+            toc_xhtml += """<li><a epub:type="{}" href="{}">{}</a></li>""".format(kind, href, xml_escape(label))
+        toc_xhtml += """</ol>\n</nav>\n"""
+    toc_xhtml += """</body>\n</html>"""
 
     return toc_xhtml
 
-def get_TOCNCX_XML(markdown_filenames, uid="", title="", lang="en"):
+def get_TOCNCX_XML(markdown_filenames, uid="", title="", lang="en", titles=None, groups=None, hidden=()):
     ## Returns the XML data for the TOC.ncx file
 
+    entries = _toc_entries(markdown_filenames, titles, groups, hidden)
+    depth = 2 if any(children for _, _, children in entries) else 1
     toc_ncx = """<?xml version="1.0" encoding="UTF-8"?>\n"""
     toc_ncx += """<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" xml:lang="{}" version="2005-1">\n""".format(xml_escape(lang))
     toc_ncx += """<head>\n"""
     toc_ncx += """<meta name="dtb:uid" content="{}"/>\n""".format(xml_escape(uid))
-    toc_ncx += """<meta name="dtb:depth" content="1"/>\n"""
+    toc_ncx += """<meta name="dtb:depth" content="{}"/>\n""".format(depth)
     toc_ncx += """<meta name="dtb:totalPageCount" content="0"/>\n"""
     toc_ncx += """<meta name="dtb:maxPageNumber" content="0"/>\n"""
     toc_ncx += """</head>\n"""
     toc_ncx += """<docTitle><text>{}</text></docTitle>\n""".format(xml_escape(title))
     toc_ncx += """<navMap>\n"""
-    for i,md_filename in enumerate(markdown_filenames):
-        stem = md_filename.split(".")[0]
-        src = quote("s{:05d}-{}.xhtml".format(i, stem))
-        toc_ncx += """<navPoint id="navpoint-{}" playOrder="{}">\n""".format(i, i + 1)
-        toc_ncx += """<navLabel>\n<text>{}</text>\n</navLabel>""".format(xml_escape(stem))
-        toc_ncx += """<content src="{}"/>""".format(src)
-        toc_ncx += """ </navPoint>"""
+
+    # navPoints that point at the same file must share a playOrder
+    order = {}
+    counter = [0]
+
+    def points(entries):
+        out = ""
+        for label, src, children in entries:
+            if src not in order:
+                order[src] = len(order) + 1
+            counter[0] += 1
+            out += """<navPoint id="navpoint-{}" playOrder="{}">\n""".format(counter[0], order[src])
+            out += """<navLabel>\n<text>{}</text>\n</navLabel>""".format(xml_escape(label))
+            out += """<content src="{}"/>""".format(src)
+            out += points(children)
+            out += """ </navPoint>"""
+        return out
+
+    toc_ncx += points(entries)
     toc_ncx += """</navMap>\n</ncx>"""
 
     return toc_ncx
@@ -424,21 +544,23 @@ def convert_math_to_mathml(html_text: str) -> str:
         mathml = try_convert(m.group(1))
         return f'<span class="math-display">{mathml}</span>' if mathml else m.group(0)
 
-    # Inline $...$
+    # Inline $...$, using pandoc's rule so currency is left alone: the opening $
+    # must be followed by a non-space, the closing $ preceded by a non-space
+    # and not followed by a digit ("$10 and $20" is not math)
     def replace_inline(m):
         mathml = try_convert(m.group(1))
         return f'<span class="math-inline">{mathml}</span>' if mathml else m.group(0)
 
     masked = re.sub(r'<p>\s*\$\$(.*?)\$\$\s*</p>', replace_display_paragraph, masked, flags=re.DOTALL)
     masked = re.sub(r'\$\$(.*?)\$\$', replace_display_inline, masked, flags=re.DOTALL)
-    masked = re.sub(r'(?<!\$)\$(?!\$)(.*?)(?<!\$)\$(?!\$)', replace_inline, masked, flags=re.DOTALL)
+    masked = re.sub(r'(?<![\$\\])\$(?![\s$])([^$]+?)(?<![\s\\])\$(?![\d$])', replace_inline, masked)
 
     for key, original in placeholders.items():
         masked = masked.replace(key, original)
 
     return masked
 
-def get_chapter_XML(work_dir: str, md_filename: str, css_filenames: list[str], content: Optional[str] = None, lang: str = "en") -> tuple[str, list[str]]:
+def get_chapter_XML(work_dir: str, md_filename: str, css_filenames: list[str], content: Optional[str] = None, lang: str = "en", title: Optional[str] = None) -> tuple[str, list[str]]:
     """
     Convert markdown chapter to XHTML and process images.
     Returns tuple of (XHTML content, list of images referenced in chapter)
@@ -475,7 +597,7 @@ def get_chapter_XML(work_dir: str, md_filename: str, css_filenames: list[str], c
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xml:lang="{xml_escape(lang)}" lang="{xml_escape(lang)}">
 <head>
     <meta http-equiv="default-style" content="text/html; charset=utf-8"/>
-    <title>{xml_escape(Path(md_filename).stem)}</title>
+    <title>{xml_escape(title or Path(md_filename).stem)}</title>
     {''.join(f'<link rel="stylesheet" href="css/{css}" type="text/css" media="all"/>' for css in css_filenames)}
 </head>
 <body>
@@ -487,13 +609,58 @@ def get_chapter_XML(work_dir: str, md_filename: str, css_filenames: list[str], c
 
 
 
+def _cover_module():
+    try:
+        from . import cover
+    except ImportError:          # run as a script from the modules directory
+        import cover
+    return cover
+
+
+def title_page_html(title: str, author: Optional[str], publisher: Optional[str]) -> str:
+    """Generated title page (themes other than 'default')."""
+    main_title, years = _cover_module().split_title(title)
+    parts = ['<section class="titlepage" epub:type="titlepage">']
+    if author:
+        parts.append(f'<p class="tp-author">{xml_escape(author)}</p>')
+    parts.append(f'<h1 class="tp-title">{xml_escape(main_title)}</h1>')
+    if years:
+        parts.append(f'<p class="tp-subtitle">{xml_escape(years)}</p>')
+    if publisher and publisher != "PDF2EPUB":
+        parts.append(f'<p class="tp-publisher">{xml_escape(publisher)}</p>')
+    parts.append("</section>")
+    return "\n".join(parts)
+
+
+def contents_page_html(entries) -> str:
+    """Generated contents page: a year-by-year index for grouped chapters."""
+    parts = ['<section class="contents" epub:type="toc">', "<h1>Contents</h1>"]
+    if any(children for _, _, children in entries):
+        parts.append('<table class="letter-index"><tbody>')
+        for label, href, children in entries:
+            if children:
+                links = "<br/>".join(f'<a href="{h}">{xml_escape(t)}</a>' for t, h, _ in children)
+                parts.append(f"<tr><th>{xml_escape(label)}</th><td>{links}</td></tr>")
+            else:
+                parts.append(f'<tr><th></th><td><a href="{href}">{xml_escape(label)}</a></td></tr>')
+        parts.append("</tbody></table>")
+    else:
+        parts.append('<ol class="contents-list">')
+        parts.extend(f'<li><a href="{h}">{xml_escape(t)}</a></li>' for t, h, _ in entries)
+        parts.append("</ol>")
+    parts.append("</section>")
+    return "\n".join(parts)
+
+
 def convert_to_epub(markdown_dir: Path, output_path: Path, metadata: Optional[Dict] = None,
-                    interactive: bool = True) -> None:
+                    interactive: bool = True, theme: Optional[str] = None) -> None:
     """
     Convert markdown files and images to EPUB format.
 
     metadata: optional dc:* fields used as defaults (e.g. from archive.org).
     interactive: prompt for metadata and markdown review; if False, use defaults.
+    theme: CSS theme from modules/themes (default, book, letters); stored in
+        description.json, so later runs reuse it.
     """
     if not markdown_dir.exists():
         raise FileNotFoundError(f"Markdown directory not found: {markdown_dir}")
@@ -503,9 +670,9 @@ def convert_to_epub(markdown_dir: Path, output_path: Path, metadata: Optional[Di
     
     # Generate EPUB file
     epub_path = markdown_dir / f"{markdown_dir.name}.epub"
-    main([str(markdown_dir), str(epub_path)], metadata=metadata, interactive=interactive)
+    main([str(markdown_dir), str(epub_path)], metadata=metadata, interactive=interactive, theme=theme)
 
-def main(args, metadata: Optional[Dict] = None, interactive: bool = True):
+def main(args, metadata: Optional[Dict] = None, interactive: bool = True, theme: Optional[str] = None):
     if len(args) < 2:
         print("\nUsage:\n    python md2epub.py <markdown_directory> <output_file.epub>")
         exit(1)
@@ -531,6 +698,10 @@ def main(args, metadata: Optional[Dict] = None, interactive: bool = True):
 
         # Get metadata from user
         json_data = get_metadata_from_user(existing_metadata, interactive=interactive)
+        if theme:
+            json_data["theme"] = theme
+        theme = json_data.get("theme") or "default"
+        css_content = theme_css(theme)
         
         # Find all markdown files if not already in metadata
         if not json_data["chapters"]:
@@ -541,38 +712,67 @@ def main(args, metadata: Optional[Dict] = None, interactive: bool = True):
                     "css": ""
                 })
         
-        # Save the updated description.json
-        with open(description_path, 'w', encoding='utf-8') as f:
-            json.dump(json_data, f, indent=2)
-        
-        # Review markdown files and store updated content
-        chapter_contents = {}
-        for chapter in json_data["chapters"]:
-            md_path = Path(work_dir) / chapter["markdown"]
-            if not interactive:
-                chapter_contents[chapter["markdown"]] = md_path.read_text(encoding='utf-8')
-                continue
-            should_continue, content = review_markdown(md_path)
-            if not should_continue:
-                print("\nConversion aborted by user.")
-                return
-            chapter_contents[chapter["markdown"]] = content
-
         # Get title and author
         title = json_data["metadata"].get("dc:title", "Untitled Document")
         authors = json_data["metadata"].get("dc:creator", None)
         lang = json_data["metadata"].get("dc:language", "en") or "en"
 
+        # Themes draw a cover when the book has none (redrawn on every run so
+        # it follows metadata changes; set cover_image to use your own)
+        if theme != "default" and (not json_data.get("cover_image") or json_data.get("cover_generated")):
+            _cover_module().make_cover(Path(work_dir) / "images" / "cover.jpg", title, authors, theme=theme)
+            json_data["cover_image"] = "cover.jpg"
+            json_data["cover_generated"] = True
+
+        # Save the updated description.json
+        with open(description_path, 'w', encoding='utf-8') as f:
+            json.dump(json_data, f, indent=2, ensure_ascii=False)
+
+        # Themes add a title page and a contents page in front of the text
+        chapters = list(json_data["chapters"])
+        generated = {}
+        if theme != "default":
+            chapters = [{"markdown": "_title.md", "css": "", "title": "Title Page"},
+                        {"markdown": "_contents.md", "css": "", "title": "Contents"}] + chapters
+            generated["_title.md"] = title_page_html(title, authors, json_data["metadata"].get("dc:publisher"))
+        
+        # Review markdown files and store updated content
+        md_files = [c["markdown"] for c in json_data["chapters"]]
+        if interactive:
+            should_continue, chapter_contents = review_markdown_files(Path(work_dir), md_files)
+            if not should_continue:
+                print("\nConversion aborted by user.")
+                return
+        else:
+            chapter_contents = {name: (Path(work_dir) / name).read_text(encoding='utf-8') for name in md_files}
+
         # Compile list of files
         all_md_filenames = []
+        # Optional per-chapter "title" used as the table-of-contents label,
+        # and "group" (e.g. a year) under which chapters are nested
+        chapter_titles = {c["markdown"]: c["title"] for c in chapters if c.get("title")}
+        chapter_groups = {c["markdown"]: c["group"] for c in chapters if c.get("group")}
+        hidden = {"_title.md"}
         all_css_filenames = json_data["default_css"][:]
-        for chapter in json_data["chapters"]:
+        for chapter in chapters:
             if chapter["markdown"] not in all_md_filenames:
                 all_md_filenames.append(chapter["markdown"])
             if len(chapter["css"]) and (chapter["css"] not in all_css_filenames):
                 all_css_filenames.append(chapter["css"])
         
         all_image_filenames = get_all_filenames(images_dir, extensions=["gif", "jpg", "jpeg", "png"])
+        if "_contents.md" in all_md_filenames:
+            entries = _toc_entries(all_md_filenames, chapter_titles, chapter_groups, hidden | {"_contents.md"})
+            generated["_contents.md"] = contents_page_html(entries)
+        chapter_contents.update(generated)
+        body_start = next((chapter_href(i, md) for i, md in enumerate(all_md_filenames)
+                           if md not in generated), chapter_href(0, all_md_filenames[0]))
+        # landmarks may only point at documents in the spine (TOC.xhtml is not)
+        landmarks = [("cover", "titlepage.xhtml", "Cover")]
+        if "_contents.md" in all_md_filenames:
+            landmarks.append(("toc", chapter_href(all_md_filenames.index("_contents.md"), "_contents.md"),
+                              "Contents"))
+        landmarks.append(("bodymatter", body_start, "Start"))
 
         # First process all chapters and images
         images_dir = Path(work_dir) / 'images'
@@ -583,7 +783,7 @@ def main(args, metadata: Optional[Dict] = None, interactive: bool = True):
 
         # First pass: Process chapters and collect image references
         print("\nProcessing chapters and collecting image references...")
-        for i, chapter in enumerate(json_data["chapters"]):
+        for i, chapter in enumerate(chapters):
             css_files = json_data["default_css"][:]
             if chapter["css"]:
                 css_files.append(chapter["css"])
@@ -594,7 +794,8 @@ def main(args, metadata: Optional[Dict] = None, interactive: bool = True):
                 chapter["markdown"], 
                 css_files,
                 content=chapter_contents[chapter["markdown"]],
-                lang=lang
+                lang=lang,
+                title=chapter.get("title")
             )
             chapter_data[chapter["markdown"]] = chapter_xhtml
             all_referenced_images.update(chapter_images)
@@ -636,6 +837,7 @@ def main(args, metadata: Optional[Dict] = None, interactive: bool = True):
             epub.writestr("OPS/package.opf", 
                 get_packageOPF_XML(
                     md_filenames=all_md_filenames,
+                    mathml_filenames={md for md, xhtml in chapter_data.items() if "<math" in xhtml},
                     image_filenames=all_image_filenames,
                     css_filenames=all_css_filenames,
                     description_data=json_data,
@@ -645,15 +847,15 @@ def main(args, metadata: Optional[Dict] = None, interactive: bool = True):
             )
 
             # Write cover page
-            coverpage_data = get_coverpage_XML(title, authors, lang)
+            coverpage_data = get_coverpage_XML(title, authors, lang, json_data.get("cover_image"))
             epub.writestr("OPS/titlepage.xhtml", coverpage_data.encode('utf-8'), zipfile.ZIP_DEFLATED)
 
             # Write processed chapters
             print("Writing chapters...")
-            for i, chapter in enumerate(json_data["chapters"]):
-                print(f"  Writing chapter {i+1}/{len(json_data['chapters'])}: {chapter['markdown']}")
+            for i, chapter in enumerate(chapters):
+                print(f"  Writing chapter {i+1}/{len(chapters)}: {chapter['markdown']}")
                 epub.writestr(
-                    f"OPS/s{i:05d}-{chapter['markdown'].split('.')[0]}.xhtml",
+                    f"OPS/{chapter_href(i, chapter['markdown'])}",
                     chapter_data[chapter["markdown"]].encode('utf-8'),
                     zipfile.ZIP_DEFLATED
                 )
@@ -667,7 +869,8 @@ def main(args, metadata: Optional[Dict] = None, interactive: bool = True):
             # Write TOC files
             print("Writing table of contents...")
             epub.writestr("OPS/TOC.xhtml", 
-                get_TOC_XML(json_data["default_css"], all_md_filenames, lang),
+                get_TOC_XML(json_data["default_css"], all_md_filenames, lang, chapter_titles,
+                            chapter_groups, hidden, landmarks),
                 zipfile.ZIP_DEFLATED
             )
             
@@ -676,7 +879,10 @@ def main(args, metadata: Optional[Dict] = None, interactive: bool = True):
                     all_md_filenames,
                     uid=json_data["metadata"].get("dc:identifier", ""),
                     title=json_data["metadata"].get("dc:title", ""),
-                    lang=lang
+                    lang=lang,
+                    titles=chapter_titles,
+                    groups=chapter_groups,
+                    hidden=hidden
                 ),
                 zipfile.ZIP_DEFLATED
             )
@@ -689,12 +895,7 @@ def main(args, metadata: Optional[Dict] = None, interactive: bool = True):
                     with open(os.path.join(images_dir, image), "rb") as f:
                         epub.writestr(f"OPS/images/{image}", f.read(), zipfile.ZIP_DEFLATED)
 
-            # Copy CSS files; write a default style.css for any that are missing
-            default_css_content = b"""body { font-family: serif; line-height: 1.5; margin: 5%; }
-h1, h2, h3, h4, h5, h6 { font-family: sans-serif; }
-img { max-width: 100%; height: auto; }
-pre, code { font-family: monospace; font-size: 0.9em; }
-"""
+            # Copy CSS files; missing ones get the theme's stylesheet
             print(f"Writing {len(all_css_filenames)} CSS files...")
             for css in all_css_filenames:
                 css_path = os.path.join(css_dir, css)
@@ -702,7 +903,7 @@ pre, code { font-family: monospace; font-size: 0.9em; }
                     with open(css_path, "rb") as f:
                         epub.writestr(f"OPS/css/{css}", f.read(), zipfile.ZIP_DEFLATED)
                 else:
-                    epub.writestr(f"OPS/css/{css}", default_css_content, zipfile.ZIP_DEFLATED)
+                    epub.writestr(f"OPS/css/{css}", css_content, zipfile.ZIP_DEFLATED)
 
         print(f"\nEPUB creation complete: {output_path}")
         

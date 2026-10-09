@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Test fixture: fictional partnership letters (original text, no rights
+  restrictions). Exercises the constructs the text-layer engine must handle.
+  Regenerate letters.pdf with LibreOffice; the exact command is in
+  tests/fixtures/README.md (XML comments cannot contain double hyphens).
+-->
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+  xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
+ <office:meta>
+  <dc:title>Harbor Lane Partners Letters</dc:title>
+  <meta:initial-creator>pdf2epub test suite</meta:initial-creator>
+ </office:meta>
+ <office:font-face-decls>
+  <style:font-face style:name="Liberation Serif" svg:font-family="'Liberation Serif'" style:font-family-generic="roman" style:font-pitch="variable"/>
+ </office:font-face-decls>
+ <office:styles>
+  <style:default-style style:family="paragraph">
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0.1757in" fo:line-height="100%"/>
+   <style:text-properties style:font-name="Liberation Serif" fo:font-size="11pt" fo:language="en" fo:country="US"/>
+  </style:default-style>
+  <style:style style:name="Standard" style:family="paragraph" style:class="text"/>
+ </office:styles>
+ <office:automatic-styles>
+  <style:page-layout style:name="pm1">
+   <style:page-layout-properties fo:page-width="8.5in" fo:page-height="11in" fo:margin-top="0.8in" fo:margin-bottom="0.45in" fo:margin-left="0.8in" fo:margin-right="0.8in"/>
+   <style:footer-style><style:header-footer-properties fo:min-height="0.35in" fo:margin-top="0.15in"/></style:footer-style>
+  </style:page-layout>
+  <style:style style:name="Head" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-align="center" fo:margin-bottom="0in"/>
+  </style:style>
+  <style:style style:name="HeadFirst" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-align="center" fo:margin-bottom="0in" fo:break-before="page"/>
+  </style:style>
+  <style:style style:name="HeadLast" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-align="center"/>
+  </style:style>
+  <style:style style:name="Date" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-align="end" fo:margin-right="0.6in"/>
+  </style:style>
+  <style:style style:name="Center" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-align="center"/>
+  </style:style>
+  <style:style style:name="Quote" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-left="0.5in" fo:margin-right="0.4in"/>
+  </style:style>
+  <style:style style:name="Item" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-left="0.75in" fo:text-indent="-0.25in"/>
+  </style:style>
+  <style:style style:name="Tabbed" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-left="0.5in" fo:margin-bottom="0in">
+    <style:tab-stops><style:tab-stop style:position="3.4in" style:type="right"/></style:tab-stops>
+   </style:paragraph-properties>
+  </style:style>
+  <style:style style:name="TabbedLast" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:margin-left="0.5in" fo:margin-bottom="0.1757in">
+    <style:tab-stops><style:tab-stop style:position="3.4in" style:type="right"/></style:tab-stops>
+   </style:paragraph-properties>
+  </style:style>
+  <style:style style:name="Cell" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-align="center" fo:margin-bottom="0in"/>
+  </style:style>
+  <style:style style:name="CellL" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-align="start" fo:margin-bottom="0in"/>
+  </style:style>
+  <style:style style:name="CellR" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-align="end" fo:margin-bottom="0in"/>
+  </style:style>
+  <style:style style:name="U" style:family="text">
+   <style:text-properties style:text-underline-style="solid" style:text-underline-width="auto" style:text-underline-color="font-color"/>
+  </style:style>
+  <style:style style:name="B" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>
+  <style:style style:name="I" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>
+  <style:style style:name="Sup" style:family="text"><style:text-properties style:text-position="super 58%"/></style:style>
+  <style:style style:name="T1" style:family="table">
+   <style:table-properties style:width="5.6in" table:align="center" fo:margin-bottom="0.1757in"/>
+  </style:style>
+  <style:style style:name="T1.A" style:family="table-column"><style:table-column-properties style:column-width="0.9in"/></style:style>
+  <style:style style:name="T1.B" style:family="table-column"><style:table-column-properties style:column-width="1.7in"/></style:style>
+  <style:style style:name="T1.C" style:family="table-column"><style:table-column-properties style:column-width="1.5in"/></style:style>
+  <style:style style:name="T1.D" style:family="table-column"><style:table-column-properties style:column-width="1.5in"/></style:style>
+  <style:style style:name="T2" style:family="table">
+   <style:table-properties style:width="5.0in" table:align="center" fo:margin-bottom="0.1757in"/>
+  </style:style>
+  <style:style style:name="T2.A" style:family="table-column"><style:table-column-properties style:column-width="1.2in"/></style:style>
+  <style:style style:name="T2.B" style:family="table-column"><style:table-column-properties style:column-width="1.9in"/></style:style>
+  <style:style style:name="T2.C" style:family="table-column"><style:table-column-properties style:column-width="1.9in"/></style:style>
+  <style:style style:name="T3" style:family="table">
+   <style:table-properties style:width="6.4in" table:align="center" fo:margin-bottom="0.1757in"/>
+  </style:style>
+  <style:style style:name="T3.A" style:family="table-column"><style:table-column-properties style:column-width="2.6in"/></style:style>
+  <style:style style:name="T3.B" style:family="table-column"><style:table-column-properties style:column-width="1.9in"/></style:style>
+  <style:style style:name="T3.C" style:family="table-column"><style:table-column-properties style:column-width="1.9in"/></style:style>
+  <style:style style:name="NoBorder" style:family="table-cell">
+   <style:table-cell-properties fo:border="none" fo:padding="0.02in"/>
+  </style:style>
+ </office:automatic-styles>
+ <office:master-styles>
+  <style:master-page style:name="Standard" style:page-layout-name="pm1">
+   <style:footer><text:p text:style-name="CellR"><text:page-number text:select-page="current">1</text:page-number></text:p></style:footer>
+  </style:master-page>
+ </office:master-styles>
+ <office:body>
+  <office:text>
+
+   <!-- ===================== Letter 1: annual letter for 1971 ===================== -->
+   <text:p text:style-name="Head">HARBOR LANE PARTNERS, LTD.</text:p>
+   <text:p text:style-name="Head">41 HARBOR LANE</text:p>
+   <text:p text:style-name="HeadLast">PORTLAND 4, MAINE</text:p>
+   <text:p text:style-name="Date">January 21, 1972</text:p>
+
+   <text:p text:style-name="Standard"><text:span text:style-name="U">How We Fared in 1971</text:span></text:p>
+   <text:p text:style-name="Standard">Every January I set down the year's results next to the "yardstick" we agreed on when each of you joined. It's a habit I intend to keep -- good years and poor ones alike -- because a record that is only reported when it flatters the reporter isn't much of a record.</text:p>
+   <text:p text:style-name="Standard">The Composite Industrial Average gained 9.3% during 1971 once dividends are counted. Our partnerships that operated for the whole year gained 21.7%, measured <text:span text:style-name="U">before</text:span> any allocation to the general partner. The full record since we began is below:</text:p>
+
+   <table:table table:name="Results" table:style-name="T1">
+    <table:table-column table:style-name="T1.A"/>
+    <table:table-column table:style-name="T1.B"/>
+    <table:table-column table:style-name="T1.C"/>
+    <table:table-column table:style-name="T1.D"/>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell"><text:span text:style-name="B">Year</text:span></text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell"><text:span text:style-name="B">Partnerships Operating Entire Year</text:span></text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell"><text:span text:style-name="B">Partnership Gain</text:span></text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell"><text:span text:style-name="B">Composite Gain*</text:span></text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">1968</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">2</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">14.2%</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">6.1%</text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">1969</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">3</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">9.8%</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">-8.4%</text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">1970</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">3</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">11.5%</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">2.9%</text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">1971</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">4</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">21.7%</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">9.3%</text:p></table:table-cell>
+    </table:table-row>
+   </table:table>
+
+   <text:p text:style-name="Standard">* Including dividends paid on the stocks in the Composite.</text:p>
+   <text:p text:style-name="Standard">After the general partner's share, and compounded from the start, the record for a limited partner reads:</text:p>
+
+   <table:table table:name="Compounded" table:style-name="T2">
+    <table:table-column table:style-name="T2.A"/>
+    <table:table-column table:style-name="T2.B"/>
+    <table:table-column table:style-name="T2.C"/>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell"><text:span text:style-name="B">Year</text:span></text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell"><text:span text:style-name="B">Limited Partners' Gain</text:span></text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell"><text:span text:style-name="B">Composite Gain</text:span></text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">1968</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">11.6%</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">6.1%</text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">1969</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">8.1%</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">-8.4%</text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">1970</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">9.4%</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">2.9%</text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">1971</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">17.5%</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">9.3%</text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell"/></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell"/></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell"/></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder" table:number-columns-spanned="3"><text:p text:style-name="Cell"><text:span text:style-name="B">COMPOUNDED</text:span></text:p></table:table-cell>
+     <table:covered-table-cell/>
+     <table:covered-table-cell/>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell"/></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell"/></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell"/></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">1968</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">11.6%</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">6.1%</text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">1968-69</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">20.6%</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">-2.8%</text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">1968-70</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">32.0%</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">0.0%</text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">1968-71</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">55.1%</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell">9.3%</text:p></table:table-cell>
+    </table:table-row>
+   </table:table>
+
+   <text:p text:style-name="Standard"><text:span text:style-name="U">Keeping Score</text:span></text:p>
+   <text:p text:style-name="Standard">Last winter I wrote the following, and I would not change a word of it:</text:p>
+   <text:p text:style-name="Quote">"A single year tells you very little about a manager. Three years tell you a bit more, and a period that includes both a falling and a rising market tells you most of what you need to know. Please judge us on that longer stretch."</text:p>
+   <text:p text:style-name="Standard">We now have such a stretch behind us, and the comparison has held up in both kinds of market. That is the only claim I care to make for it.</text:p>
+
+   <text:p text:style-name="Standard"><text:span text:style-name="U">Where Our Money Goes</text:span></text:p>
+   <text:p text:style-name="Standard">Our commitments fall into three groups, each behaving differently from the others:</text:p>
+   <text:p text:style-name="Item">(1)<text:tab/>Undervalued common stocks bought for their own merits, which tend to move with the general market in the short run but should do better than it over a period of years.</text:p>
+   <text:p text:style-name="Item">(2)<text:tab/>Special situations whose outcome depends on a corporate event -- a merger, a liquidation, a tender -- rather than on the level of the market. These earn a steadier, more modest return.</text:p>
+   <text:p text:style-name="Item">(3)<text:tab/>Holdings large enough that we take a hand in the company's affairs. These are few, they take years, and they are the reason our results can look lumpy.</text:p>
+   <text:p text:style-name="Standard">Early in the year a buyer for Rockport Canning was rumored, and by spring the terms were public: the figure was $4.15 per share.<text:line-break/>Mr. Abel attended the annual meeting in Boston, where the closing was put at sometime in the autumn.</text:p>
+
+   <text:p text:style-name="Standard"><text:span text:style-name="U">Growing Pains</text:span></text:p>
+   <text:p text:style-name="Standard">Partners sometimes ask whether our growing size will make the job harder. The honest answer is that it will, eventually, but not yet. A small partnership can buy a few thousand shares of an obscure company without anyone noticing; a large one cannot. For the present our capital is small enough that the opportunities I find are limited by my own time rather than by our size, and I expect that to remain true for several more years.</text:p>
+   <text:p text:style-name="Standard">What size does change is the kind of company we can own outright. A few years ago a business worth a million dollars would have been far beyond us. Today it is within reach, and that opens a category of investment that was closed to us before. I would rather own a modest, honest business at a fair price than a glamorous one at a price that assumes everything goes right.</text:p>
+   <text:p text:style-name="Standard">I am often asked how I decide when a holding has run its course. There is no formula. When the price of a security reaches a level that fairly reflects its value, and something cheaper is available, we switch. When nothing cheaper is available we wait, and waiting has been one of our more profitable activities. I make no forecast of the market for 1972 and I do not know of anyone whose forecasts I would care to rely on. If the market should fall sharply, our comparative results should be good, although our absolute results may well be negative; if it should rise sharply, we will probably trail the Composite and you should not be surprised when we do. Over a full cycle, rising and falling, I expect us to do meaningfully better than the average, and I would be disappointed with any result that fell short of that over five years. Some of you have asked whether a good year should change any of these expectations. It should not. A good year mostly reflects the particular opportunities that happened to be available, and those come and go on their own schedule rather than on ours.</text:p>
+   <text:p text:style-name="Standard">Our accountants have completed the audit, and each of you will receive a statement of your capital account with this letter. Tax information will follow by the middle of February.</text:p>
+   <text:p text:style-name="Standard">Cordially,</text:p>
+   <text:p text:style-name="Standard">Edward T. Lindqvist</text:p>
+
+   <!-- ===================== Letter 2: mid-year 1972 ===================== -->
+   <text:p text:style-name="HeadFirst">HARBOR LANE PARTNERS, LTD.</text:p>
+   <text:p text:style-name="Head">41 HARBOR LANE</text:p>
+   <text:p text:style-name="HeadLast">PORTLAND 4, MAINE</text:p>
+   <text:p text:style-name="Date">July 9<text:span text:style-name="Sup">th</text:span>, 1972</text:p>
+
+   <text:p text:style-name="Standard"><text:span text:style-name="U">First Half Performance</text:span></text:p>
+   <text:p text:style-name="Standard">During the first six months the market did very little, and so did we. The half-year figures were:</text:p>
+   <text:p text:style-name="Tabbed">Composite Industrial Average<text:tab/>-3.1%</text:p>
+   <text:p text:style-name="Tabbed">Harbor Lane Partners<text:tab/>4.6%</text:p>
+   <text:p text:style-name="TabbedLast">Limited Partners<text:tab/>3.7%</text:p>
+   <text:p text:style-name="Standard">We added to our position in the 6 1/2% notes of a regional railroad, which can be called at 104 1/4 and which we bought well below that level. The notes are not exciting, but they pay us to wait.</text:p>
+   <text:p text:style-name="Standard">Cordially,</text:p>
+   <text:p text:style-name="Standard">Edward T. Lindqvist</text:p>
+
+   <!-- ===================== Letter 3: special letter ===================== -->
+   <text:p text:style-name="HeadFirst">HARBOR LANE PARTNERS, LTD.</text:p>
+   <text:p text:style-name="Head">41 HARBOR LANE</text:p>
+   <text:p text:style-name="HeadLast">PORTLAND 4, MAINE</text:p>
+   <text:p text:style-name="Date">October 2, 1972</text:p>
+
+   <text:p text:style-name="Standard">To My Partners:</text:p>
+   <text:p text:style-name="Standard">A few practical points before year end:</text:p>
+   <text:p text:style-name="Item">(a)<text:tab/>Additions to your interest should reach us by December 20th so they can be credited from January 1st.</text:p>
+   <text:p text:style-name="Item">(b)<text:tab/>Withdrawals follow the same calendar; please write rather than telephone so we have a record.</text:p>
+   <text:p text:style-name="Standard">Sincerely,</text:p>
+   <text:p text:style-name="Standard">Edward T. Lindqvist</text:p>
+
+   <!-- ===================== Letter 4: annual letter for 1972 ===================== -->
+   <text:p text:style-name="HeadFirst">HARBOR LANE PARTNERS, LTD.</text:p>
+   <text:p text:style-name="Head">41 HARBOR LANE</text:p>
+   <text:p text:style-name="HeadLast">PORTLAND 4, MAINE</text:p>
+   <text:p text:style-name="Date">January 19, 1973</text:p>
+
+   <text:p text:style-name="Standard"><text:span text:style-name="U">Our Results in 1972</text:span></text:p>
+   <text:p text:style-name="Standard">The Composite rose 7.4% including dividends; we rose 12.9%. The largest contributor was Rockport Canning, whose figures appear in the appendix so you can follow the change in its balance sheet for yourselves.</text:p>
+   <text:p text:style-name="Center"><text:span text:style-name="U">APPENDIX</text:span></text:p>
+   <text:p text:style-name="Standard"><text:span text:style-name="U">ROCKPORT CANNING COMPANY</text:span></text:p>
+   <text:p text:style-name="Standard">When we took control the company carried far more inventory than it could sell in a season. The comparison below shows what a year of patient housekeeping did:</text:p>
+
+   <table:table table:name="Balance" table:style-name="T3">
+    <table:table-column table:style-name="T3.A"/>
+    <table:table-column table:style-name="T3.B"/>
+    <table:table-column table:style-name="T3.C"/>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellL"/></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell"><text:span text:style-name="B">12/31/70</text:span></text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="Cell"><text:span text:style-name="B">11/30/72 (unaudited)</text:span></text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellL">Cash</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR">$92,000</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR">$61,000</text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellL">Marketable securities at market (which exceeds cost)</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR"/></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR">$1,214,000</text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellL"><text:span text:style-name="B">Total Cash and Securities</text:span></text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR"><text:span text:style-name="B">$92,000</text:span></text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR"><text:span text:style-name="B">$1,275,000</text:span></text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellL"/></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR"/></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR"/></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellL">Accounts receivable (net)</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR">$640,000</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR">$512,000</text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellL">Inventory</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR">$2,310,000</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR">$705,000</text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellL"><text:span text:style-name="B">Current Assets</text:span></text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR"><text:span text:style-name="B">$3,042,000</text:span></text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR"><text:span text:style-name="B">$2,492,000</text:span></text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellL"/></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR"/></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR"/></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellL">Notes Payable</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR">$750,000</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR"/></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellL"><text:span text:style-name="B">Total Liabilities</text:span></text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR"><text:span text:style-name="B">$1,121,000</text:span></text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR"><text:span text:style-name="B">$188,000</text:span></text:p></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellL"/></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR"/></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR"/></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellL">Net worth</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR"/></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR"/></table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellL">84,120 shs. outstanding</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR">$2,013,000</text:p></table:table-cell>
+     <table:table-cell table:style-name="NoBorder"><text:p text:style-name="CellR">$2,436,000</text:p></table:table-cell>
+    </table:table-row>
+   </table:table>
+
+   <text:p text:style-name="Standard">I expect the company to earn its keep from here, and to do it with a fraction of the capital it used to tie up.</text:p>
+   <text:p text:style-name="Standard">Cordially,</text:p>
+   <text:p text:style-name="Standard">Edward T. Lindqvist</text:p>
+
+  </office:text>
+ </office:body>
+</office:document>

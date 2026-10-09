@@ -5,6 +5,9 @@ Convert PDF files to nicely structured Markdown and EPUB format with intelligent
 ## ✨ Features
 
 - 📖 Smart layout detection for books and academic papers
+- ⚡ Fast text-layer engine for born-digital PDFs: no OCR, keeps italics, bold and underlining, rebuilds tables and links footnotes
+- ✉️ Letters layout for letter collections: one chapter per dated letter, grouped by year
+- 🎨 Themes with a generated cover, title page and contents page
 - 🔍 Advanced text extraction and OCR capabilities
 - 📊 Table detection and formatting
 - 🖼️ Image extraction and optimization
@@ -148,12 +151,70 @@ Options:
   --start-page INT         Page number to start from
   --skip-epub              Skip EPUB generation, only create markdown
   --skip-md                Skip markdown generation, use existing markdown files
+  --chunk-size INT         Pages converted per batch (default 10, 0 = all at once)
+  --engine ENGINE          auto (default), textlayer or marker; see below
+  --layout LAYOUT          Text-layer engine: auto (default), book or letters
+  --theme THEME            EPUB styling: default, book or letters
   -y, --yes                Non-interactive: accept default metadata, skip review
 ```
 
 If `input_path` is omitted, all PDFs in `./input/` are processed.
 
+PDFs are converted in batches of `--chunk-size` pages with the models loaded
+once, so memory use stays flat regardless of document length. If the process
+is still killed for running out of memory (exit code 137), lower it, e.g.
+`--chunk-size 4`.
+
+### Engines
+
+PDF2EPUB has two ways of turning a PDF into Markdown:
+
+- **textlayer** reads the text a born-digital PDF already contains (PDFs
+  exported from Word, LibreOffice, InDesign, LaTeX or an e-book tool). It takes
+  seconds rather than hours on a CPU, and it keeps italics, bold and underlining
+  (underlined text becomes italics), rebuilds tables from the column positions,
+  drops running heads and page numbers, joins paragraphs across page breaks and
+  turns footnotes into linked notes. It does not handle scanned pages or text
+  set in several columns.
+- **marker** runs OCR and layout models. It handles scans, multi-column pages
+  and equations, but is slow without a GPU.
+
+With `--engine auto` (the default) each PDF is checked first: the text-layer
+engine is used when the PDF has a usable text layer in a single column, marker
+otherwise. The choice is printed for every file.
+
+### Layouts and themes
+
+The text-layer engine recognises two layouts (`--layout`, detected by default):
+
+- **book**: one chapter per top-level heading.
+- **letters**: a collection of dated letters, such as shareholder letters. Each
+  letter becomes a chapter titled by its date, and the contents group the
+  letters by year (an annual letter written in January or February is filed
+  under the year it reports on). Letterheads are dropped, and the book title
+  and author are suggested from the letterhead and the signature.
+
+Themes (`--theme`) control the look of the EPUB:
+
+- **default**: the plain style, as before.
+- **book**: indented paragraphs, generated cover, title page and contents.
+- **letters**: letters open under their year, financial tables are set with
+  rules above and below and right-aligned figures, and a black-and-gold cover,
+  a title page and a year-by-year contents page are generated.
+
+Text-layer output uses the letters or book theme automatically; marker output
+keeps the default theme unless you pass `--theme`. The theme is remembered in
+`description.json`, so `--skip-md` runs reuse it. The generated cover is
+redrawn on every run; to use your own, put the image in `images/` and set
+`"cover_image"` to its file name and `"cover_generated"` to `false` in
+`description.json`.
+
 ### Examples
+
+Convert a collection of letters, without prompts:
+```bash
+python main.py letters.pdf --layout letters --yes
+```
 
 Process a specific range of pages:
 ```bash
@@ -209,7 +270,18 @@ venv\Scripts\activate     # Windows
 3. Install development dependencies:
 ```bash
 pip install -r requirements.txt
+pip install pytest
 ```
+
+4. Run the tests:
+```bash
+python -m pytest -q
+```
+
+The tests use the fixtures in `tests/fixtures/` (see the README there) and
+need neither torch nor marker. Set `EPUBCHECK_JAR` to the path of
+`epubcheck.jar` to also validate the generated EPUBs with
+[EPUBCheck](https://github.com/w3c/epubcheck).
 
 ## 📄 License
 
@@ -220,6 +292,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Some image embedding might need manual adjustment
 - Some complex mathematical equations might not be perfectly converted
 - Certain PDF layouts with multiple columns may require manual adjustment
+  (`--engine auto` sends them to marker; `--engine textlayer` would read them
+  across the columns)
 - Font detection might be imperfect in some cases
 
 ## 🙏 Acknowledgments

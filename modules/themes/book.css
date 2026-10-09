@@ -1,0 +1,68 @@
+@charset "utf-8";
+/* Book theme: continuous prose with indented paragraphs. */
+
+body {
+  font-family: Georgia, "Charis SIL", "Times New Roman", serif;
+  line-height: 1.5;
+  margin: 0 5%;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  widows: 2;
+  orphans: 2;
+}
+
+p { margin: 0; text-indent: 1.3em; }
+h1 + p, h2 + p, h3 + p, h4 + p, blockquote + p, table + p, p.center + p, p.first { text-indent: 0; }
+
+h1 {
+  font-size: 1.6em;
+  font-weight: normal;
+  text-align: center;
+  margin: 2.5em 0 1.4em 0;
+  page-break-before: always;
+  break-before: page;
+}
+h2 { font-size: 1.2em; font-weight: bold; margin: 1.6em 0 0.6em 0; page-break-after: avoid; }
+h3, h4 { font-size: 1em; font-weight: bold; margin: 1.3em 0 0.5em 0; page-break-after: avoid; }
+.center { text-align: center; text-indent: 0; }
+
+blockquote { margin: 0.8em 2em; font-size: 0.95em; }
+blockquote p { text-indent: 0; margin-bottom: 0.4em; }
+p.item { padding-left: 2em; text-indent: -2em; text-align: left; }
+p.item span.label { display: inline-block; width: 2em; text-indent: 0; }
+
+table.data {
+  border-collapse: collapse;
+  margin: 1em auto;
+  font-size: 0.85em;
+  border-top: 1.5px solid #000;
+  border-bottom: 1.5px solid #000;
+}
+table.data th, table.data td { padding: 0.2em 0.7em; vertical-align: bottom; }
+table.data thead th { border-bottom: 0.75px solid #000; }
+table.data .num { text-align: right; }
+table.data tr.sub th { text-align: center; font-weight: normal; font-variant: small-caps; padding-top: 0.8em; }
+table.data tr.gap td { padding-top: 0.7em; }
+table.data tr.total td { font-weight: bold; border-top: 0.5px solid #555; }
+p.table-note { font-size: 0.8em; text-indent: 0; margin: 0 1.5em 1em 1.5em; }
+
+img { max-width: 100%; height: auto; }
+
+section.titlepage { text-align: center; margin-top: 20%; }
+section.titlepage p { text-align: center; text-indent: 0; }
+p.tp-author { font-variant: small-caps; letter-spacing: 0.1em; margin-bottom: 2.5em; }
+h1.tp-title { page-break-before: auto; break-before: auto; font-size: 2em; margin: 0 0 0.5em 0; }
+p.tp-subtitle { font-style: italic; margin-bottom: 3em; }
+p.tp-publisher { font-size: 0.9em; color: #444; }
+
+section.contents h1 { page-break-before: auto; break-before: auto; }
+ol.contents-list { list-style: none; padding: 0; }
+ol.contents-list li { margin: 0.35em 0; text-indent: 0; }
+ol.contents-list a, table.letter-index a { text-decoration: none; color: inherit; }
+table.letter-index th { text-align: right; vertical-align: top; padding: 0.3em 1em 0.3em 0; }
+table.letter-index td { text-align: left; vertical-align: top; padding: 0.3em 0; }
+
+section.footnotes { margin-top: 2em; border-top: 0.5px solid #999; padding-top: 0.6em; font-size: 0.85em; }
+section.footnotes p { text-indent: 0; margin-bottom: 0.4em; text-align: left; }
+a.noteref { text-decoration: none; }

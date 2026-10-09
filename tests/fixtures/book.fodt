@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Test fixture: a short fictional essay (original text, no rights
+  restrictions) set as a book: chapter headings, first-line indents,
+  footnotes, a running header, page numbers and an embedded image.
+  Regenerate book.pdf as described in tests/fixtures/README.md.
+-->
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+  xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
+ <office:meta><dc:title>On Patience</dc:title><meta:initial-creator>pdf2epub test suite</meta:initial-creator></office:meta>
+ <office:font-face-decls>
+  <style:font-face style:name="Liberation Serif" svg:font-family="'Liberation Serif'" style:font-family-generic="roman"/>
+ </office:font-face-decls>
+ <office:styles>
+  <style:default-style style:family="paragraph">
+   <style:paragraph-properties fo:margin-top="0in" fo:margin-bottom="0in" fo:text-align="justify"/>
+   <style:text-properties style:font-name="Liberation Serif" fo:font-size="11pt" fo:language="en" fo:country="US"/>
+  </style:default-style>
+  <style:style style:name="Standard" style:family="paragraph" style:class="text"/>
+  <style:style style:name="H1" style:family="paragraph" style:parent-style-name="Standard" style:default-outline-level="1">
+   <style:paragraph-properties fo:text-align="center" fo:margin-top="0.6in" fo:margin-bottom="0.3in" fo:break-before="page"/>
+   <style:text-properties fo:font-size="18pt" fo:font-weight="bold"/>
+  </style:style>
+  <style:style style:name="H2" style:family="paragraph" style:parent-style-name="Standard" style:default-outline-level="2">
+   <style:paragraph-properties fo:text-align="start" fo:margin-top="0.2in" fo:margin-bottom="0.08in"/>
+   <style:text-properties fo:font-size="13pt" fo:font-weight="bold"/>
+  </style:style>
+  <style:style style:name="Body" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-indent="0.3in"/>
+  </style:style>
+  <style:style style:name="First" style:family="paragraph" style:parent-style-name="Standard"/>
+  <style:style style:name="Figure" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-align="center" fo:margin-top="0.12in" fo:margin-bottom="0.05in"/>
+  </style:style>
+  <style:style style:name="Caption" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-align="center" fo:margin-bottom="0.12in"/>
+   <style:text-properties fo:font-size="9pt" fo:font-style="italic"/>
+  </style:style>
+  <style:style style:name="Footnote" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-align="start"/>
+   <style:text-properties fo:font-size="9pt"/>
+  </style:style>
+  <style:style style:name="RunningHead" style:family="paragraph" style:parent-style-name="Standard">
+   <style:paragraph-properties fo:text-align="center"/>
+   <style:text-properties fo:font-size="9pt" fo:letter-spacing="0.02in"/>
+  </style:style>
+ </office:styles>
+ <office:automatic-styles>
+  <style:page-layout style:name="pm1">
+   <style:page-layout-properties fo:page-width="6in" fo:page-height="9in" fo:margin-top="0.5in" fo:margin-bottom="0.5in" fo:margin-left="0.75in" fo:margin-right="0.75in"/>
+   <style:header-style><style:header-footer-properties fo:min-height="0.3in" fo:margin-bottom="0.15in"/></style:header-style>
+   <style:footer-style><style:header-footer-properties fo:min-height="0.3in" fo:margin-top="0.15in"/></style:footer-style>
+  </style:page-layout>
+ </office:automatic-styles>
+ <office:master-styles>
+  <style:master-page style:name="Standard" style:page-layout-name="pm1">
+   <style:header><text:p text:style-name="RunningHead">ON PATIENCE</text:p></style:header>
+   <style:footer><text:p text:style-name="RunningHead"><text:page-number text:select-page="current">1</text:page-number></text:p></style:footer>
+  </style:master-page>
+ </office:master-styles>
+ <office:body><office:text>
+<text:h text:style-name="H1" text:outline-level="1">The Slow Craft</text:h>
+<text:p text:style-name="First">Every workshop has a wall where the unfinished things hang. Visitors take it for clutter, but the people who work there know it as a calendar: each object marks a problem that could not be solved on the day it was met.<text:note text:id="ftn1" text:note-class="footnote"><text:note-citation>1</text:note-citation><text:note-body><text:p text:style-name="Footnote">The phrase is borrowed from a cabinetmaker’s notebook kept between 1931 and 1958.</text:p></text:note-body></text:note> The wall is less a record of failure than a list of appointments.</text:p>
+<text:p text:style-name="Body">Patience in a craft is not the same as slowness. A joiner who waits a week for glue to cure is not idle; the week is part of the joint. What looks like delay from the outside is, from the bench, simply the length of the job. Learning to see the difference is most of an apprenticeship.</text:p>
+<text:p text:style-name="Body">The impatient worker treats every pause as a cost to be cut. The patient one asks what the pause is doing. Sometimes the answer is nothing, and the pause should go; more often the answer is that the material is changing, and hurrying it would undo the work.</text:p>
+<text:h text:style-name="H2" text:outline-level="2">Measuring the Unmeasurable</text:h>
+<text:p text:style-name="First">It is tempting to count hours. Hours are easy to count, and a ledger of them looks like progress.<text:note text:id="ftn2" text:note-class="footnote"><text:note-citation>2</text:note-citation><text:note-body><text:p text:style-name="Footnote">Ledgers of hours were common in guild workshops; few of them survive intact.</text:p></text:note-body></text:note> But hours measure attendance, not skill, and a year of attendance can teach less than a month of attention.</text:p>
+<text:p text:style-name="Body">Our own records, kept for a year in a small shop, show the familiar shape: a slow start, a long middle in which nothing seemed to change, and a late rise that surprised everyone, including the person doing the work. The figure below sets out the monthly totals.</text:p>
+<text:p text:style-name="Figure"><draw:frame draw:name="chart" text:anchor-type="as-char" svg:width="3.6in" svg:height="1.8in"><draw:image><office:binary-data>iVBORw0KGgoAAAANSUhEUgAAAlgAAAEsCAIAAACQX1rBAAAFG0lEQVR4nO3XwY3UQBRF0d/IuTkIh+E4HIaDcHTNFrEACTHUDPecAKre7uq/3u/3AEDVt9UDAGAlIQQgTQgBSBNCANKEEIA0IQQgTQgBSBNCANKEEIA0IQQgTQgBSBNCANKEEIA0IQQgTQgBSBNCANKEEIA0IQQgTQgBSBNCANKEEIA0IQQgTQgBSBNCANKEEIA0IQQgTQgBSNtWDwBgvf24Vk+YmXnu899/6iIEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDSttUDgJb9uFZPmJl57nP1BD4LFyEAaUIIQJoQApAmhACkCSEAaUIIQJoQApAmhACkCSEAaUIIQJoQApAmhACkCSEAaUIIQJoQApAmhACkCSEAaUIIQJoQApAmhACkCSEAadvqAQBf1X5cqyfMzDz3uXrC1+YiBCBNCAFIE0IA0oQQgDQhBCBNCAFIE0IA0oQQgDQhBCBNCAFIE0IA0oQQgDQhBCBNCAFIE0IA0oQQgDQhBCBNCAFIE0IA0oQQgDQhBCBtWz0APsp+XKsnzMw897l6AvArLkIA0oQQgDQhBCBNCAFIE0IA0oQQgDQhBCBNCAFIE0IA0oQQgDQhBCBNCAFIE0IA0oQQgDQhBCBNCAFIE0IA0oQQgDQhBCBNCAFIE0IA0rbVA4Df249r9YSZmec+V0+Av89FCECaEAKQJoQApAkhAGlCCECaEAKQJoQApAkhAGlCCECaEAKQJoQApAkhAGlCCECaEAKQJoQApAkhAGlCCECaEAKQJoQApAkhAGlCCEDatnrA/2A/rtUTZmae+1w9AeDrcRECkCaEAKQJIQBpQghAmhACkCaEAKQJIQBpQghAmhACkCaEAKQJIQBpQghAmhACkCaEAKQJIQBpQghAmhACkCaEAKQJIQBpQghAmhACkLatHsDnsh/X6gkzM899rp4AVLgIAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUjbVn28H9eqr3/03OfqCQCs5CIEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIE0IAUgTQgDShBCANCEEIO31fr8/6unX64NeBoCf/HHOXIQApH3gRQgAn5+LEIA0IQQgTQgBSBNCANKEEIA0IQQgTQgBSBNCANKEEIA0IQQgTQgBSBNCANKEEIA0IQQgTQgBSBNCANKEEIA0IQQgTQgBSBNCANKEEIA0IQQgTQgBSBNCANKEEIA0IQQgTQgBSPsOqVAmXWz3TOgAAAAASUVORK5CYII=</office:binary-data></draw:image></draw:frame></text:p>
+<text:p text:style-name="Caption">Figure 1. Hours of practice recorded each month.</text:p>
+<text:p text:style-name="First">No one in the shop could have predicted the late rise from the early months. That is the lesson of the chart, and it is the lesson of the wall of unfinished things: the useful measure is taken at the end, not along the way.</text:p>
+<text:p text:style-name="Body">Apprentices are told this many times and believe it rarely. The belief comes later, usually in a single afternoon when a technique that had refused to work for months suddenly works, and keeps working. After that afternoon the earlier months look different. They were not wasted; they were the price of the afternoon, and there was no cheaper way to pay it. Some apprentices keep a note of the date, as though it were a birthday, and in a sense it is one.</text:p>
+<text:p text:style-name="Body">Apprentices are told this many times and believe it rarely. The belief comes later, usually in a single afternoon when a technique that had refused to work for months suddenly works, and keeps working. After that afternoon the earlier months look different. They were not wasted; they were the price of the afternoon, and there was no cheaper way to pay it. Some apprentices keep a note of the date, as though it were a birthday, and in a sense it is one.</text:p>
+<text:p text:style-name="Body">Apprentices are told this many times and believe it rarely. The belief comes later, usually in a single afternoon when a technique that had refused to work for months suddenly works, and keeps working. After that afternoon the earlier months look different. They were not wasted; they were the price of the afternoon, and there was no cheaper way to pay it. Some apprentices keep a note of the date, as though it were a birthday, and in a sense it is one.</text:p>
+<text:h text:style-name="H1" text:outline-level="1">Waiting Well</text:h>
+<text:p text:style-name="First">There is a difference between waiting and waiting well. The first is merely the absence of action; the second is a kind of action in its own right.<text:note text:id="ftn3" text:note-class="footnote"><text:note-citation>3</text:note-citation><text:note-body><text:p text:style-name="Footnote">Compare the distinction between rest and recovery drawn by athletic trainers.</text:p></text:note-body></text:note> A good waiter in this sense keeps the work in mind without touching it, so that when the moment comes, the hands are ready.</text:p>
+<text:p text:style-name="Body">Waiting well also means choosing what not to do. A craftsman who fills every pause with a new project ends the year with a wall of unfinished things and nothing on the shelf. One who waits on the right project, and only that one, ends with less variety and more finished work.</text:p>
+<text:p text:style-name="Body">None of this can be reduced to a rule, and the attempt to do so is itself a form of impatience. The best that can be offered is a habit: when the work stops, ask why before asking how to restart it. The answer will not always be welcome, but it will usually be useful, and over the course of a working life the habit repays itself many times over. It is, in the end, the only shortcut the slow crafts allow.</text:p>
+<text:p text:style-name="Body">None of this can be reduced to a rule, and the attempt to do so is itself a form of impatience. The best that can be offered is a habit: when the work stops, ask why before asking how to restart it. The answer will not always be welcome, but it will usually be useful, and over the course of a working life the habit repays itself many times over. It is, in the end, the only shortcut the slow crafts allow.</text:p>
+ </office:text></office:body>
+</office:document>

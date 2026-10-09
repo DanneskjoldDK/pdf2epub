@@ -1,0 +1,15 @@
+body { font-family: serif; line-height: 1.5; margin: 5%; }
+h1, h2, h3, h4, h5, h6 { font-family: sans-serif; }
+img { max-width: 100%; height: auto; }
+pre, code { font-family: monospace; font-size: 0.9em; }
+
+/* Blocks produced by the text-layer engine */
+.center { text-align: center; }
+p.item { padding-left: 2em; text-indent: -2em; }
+p.table-note { font-size: 0.85em; }
+table.data { border-collapse: collapse; margin: 1em auto; }
+table.data th, table.data td { padding: 0.2em 0.6em; vertical-align: bottom; }
+table.data .num { text-align: right; }
+table.data tr.sub th { text-align: center; padding-top: 0.6em; }
+table.data tr.gap td { padding-top: 0.6em; }
+table.data tr.total td { font-weight: bold; }

@@ -74,44 +74,106 @@ def save_images(images: dict, image_dir: Path) -> None:
     else:
         print("No valid images were found to save")
 
+# Pages converted per marker run. Marker keeps every page image of a run in
+# memory, so converting a large PDF in one go can exhaust RAM (the process is
+# then killed by the OS). Converting fixed-size chunks with the models loaded
+# once keeps peak memory independent of the document length.
+DEFAULT_CHUNK_SIZE = 10
+
+
+def get_page_count(input_path: str) -> int:
+    import pypdfium2
+    pdf = pypdfium2.PdfDocument(input_path)
+    try:
+        return len(pdf)
+    finally:
+        pdf.close()
+
+
+def page_chunks(first: int, last: int, chunk_size: int) -> list[list[int]]:
+    """Split the page indices first..last-1 into lists of at most chunk_size."""
+    if chunk_size <= 0:
+        chunk_size = max(last - first, 1)
+    return [list(range(s, min(s + chunk_size, last))) for s in range(first, last, chunk_size)]
+
+
+def merge_metadata(parts: list[dict]) -> dict:
+    """Combine the metadata dicts of several marker runs into one."""
+    merged: dict = {}
+    for part in parts:
+        for key, value in (part or {}).items():
+            if isinstance(value, list):
+                merged.setdefault(key, []).extend(value)
+            elif isinstance(value, dict) and isinstance(merged.get(key), dict):
+                merged[key].update(value)
+            else:
+                merged.setdefault(key, value)
+    return merged
+
+
 def convert_pdf(
     input_path: str,
     output_dir: Path,
     max_pages: int = None,
     start_page: int = None,
+    chunk_size: int = DEFAULT_CHUNK_SIZE,
 ) -> None:
     """
     Convert a single PDF file to markdown format with enhanced image handling.
+
+    The pages are converted in chunks of chunk_size pages (0 = all at once) to
+    bound memory use; the results are concatenated in page order.
     """
+    import gc
+
     try:
         from marker.models import create_model_dict
         from marker.converters.pdf import PdfConverter
 
+        page_count = get_page_count(input_path)
+        first = start_page or 0
+        if first >= page_count:
+            raise ValueError(
+                f"--start-page {first} is beyond the last page ({page_count - 1})"
+            )
+        last = page_count if max_pages is None else min(first + max_pages, page_count)
+        chunks = page_chunks(first, last, chunk_size)
+
+        # Load the models once and reuse them for every chunk
         models = create_model_dict()
 
-        # Build page_range config. marker-pdf 1.x requires an explicit list of
-        # page indices; there is no "start to end" shorthand. If start_page is
-        # given without max_pages we cannot construct the range without knowing
-        # the document's page count, so we warn and process all pages instead.
-        config = {}
-        if max_pages is not None:
-            s = start_page or 0
-            config["page_range"] = list(range(s, s + max_pages))
-        elif start_page is not None:
-            print(
-                "Warning: --start-page requires --max-pages in marker-pdf 1.x "
-                "(no open-ended page range is supported). Processing all pages."
-            )
+        markdown_parts = []
+        metadata_parts = []
+        images = {}
+        for n, pages in enumerate(chunks, 1):
+            if len(chunks) > 1:
+                print(f"Pages {pages[0] + 1}-{pages[-1] + 1} of {page_count} (chunk {n}/{len(chunks)})")
+            converter = PdfConverter(config={"page_range": pages}, artifact_dict=models)
+            rendered = converter(input_path)
+            markdown_parts.append(rendered.markdown.strip())
+            metadata_parts.append(rendered.metadata)
+            # Image names include the absolute page number, so they are unique across chunks
+            images.update(rendered.images)
+            del converter, rendered
+            gc.collect()
 
-        converter = PdfConverter(config=config, artifact_dict=models)
-        rendered = converter(input_path)
-
-        full_text = rendered.markdown
-        images = rendered.images
-        metadata = rendered.metadata
+        full_text = "\n\n".join(part for part in markdown_parts if part) + "\n"
+        metadata = merge_metadata(metadata_parts)
 
         # All output will go to the output directory
         output_dir.mkdir(parents=True, exist_ok=True)
+
+        # A previous text-layer run in this directory listed its own chapter
+        # files in description.json; drop them so marker's output is used
+        description = output_dir / "description.json"
+        if description.exists():
+            data = json.loads(description.read_text(encoding="utf-8"))
+            if data.get("engine") == "textlayer":
+                for chapter in data.get("chapters", []):
+                    (output_dir / chapter["markdown"]).unlink(missing_ok=True)
+                for key in ("chapters", "layout", "engine", "theme"):
+                    data.pop(key, None)
+                description.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
 
         # Save markdown content
         md_output = output_dir / f"{Path(input_path).stem}.md"
